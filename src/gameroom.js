@@ -5,6 +5,7 @@ import Player from './renderables/game_objects/player';
 import { LoadIntoArray, Diff, Combine } from './renderables/misc/common';
 import { LS_PREFIX, MAX_STATES } from './misc/constants';
 import { Renderer } from './renderer';
+import { Networking } from './networking/websocket';
 
 // There can only be one Room open per webpage, export a singleton
 class GameRoomSingleton {

@@ -45,8 +45,8 @@
   "scripts": {
     "start": "webpack-dev-server --json --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "build-stats": "webpack --config webpack.prod.js --display-modules --stats",
     "deploy": "gh-pages -d build",
+    "build-deploy": "npm run build && npm run deploy",
     "css": "./node_modules/node-sass/bin/node-sass public/css/blueprint.scss -o public/css --importer=node_modules/node-sass-package-importer/dist/cli.js --functions ./node_modules/@blueprintjs/core/scripts/sass-custom-functions.js --output-style compressed"
   }
 }

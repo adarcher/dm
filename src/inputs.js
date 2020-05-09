@@ -82,7 +82,11 @@ export const EnableInput = (dom, full_use = false) => {
       RenderInfo.Update(data);
 
       // TODO: Clean this up
-      if (event.type != 'mouseleave' && !RenderInfo.pan_offset) {
+      if (
+        event.type != 'mouseleave' &&
+        (!RenderInfo.pan_offset ||
+          RenderInfo.pan_offset.offset == RenderInfo.offset)
+      ) {
         let ping = {
           x: RenderInfo.location.x,
           y: RenderInfo.location.y,
