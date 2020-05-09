@@ -13,7 +13,7 @@ let previous_player_state = false;
 const CheckPlayerState = () => {
   const current_player_state = Player.SavePlayer();
   const token = GameRoom.tokens.find(t => t.name == current_player_state.name);
-  if (token && token.locked) {
+  if (token) {
     token.Load(current_player_state);
     Object.assign(current_player_state, token.Save());
   }
