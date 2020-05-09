@@ -1,7 +1,7 @@
 import { observable } from 'mobx';
 import { PPI } from '../../misc/constants.js';
 import { RenderInfo } from '../../render_info.js';
-import { ImageSource, SourceState } from './image_source';
+import { ImageSource } from './image_source';
 
 export default class LayerImage {
   @observable url = 'https://i.imgur.com/wAzWXr8.jpg';
@@ -9,14 +9,9 @@ export default class LayerImage {
   @observable offset = { x: 17.312186908549947, y: 11.754145065933258 };
   // @observable rotation = 0;
 
-  get valid() {
-    var ini = ImageSource(this.url);
-    return ini.state == SourceState.Loaded;
-  }
-
   get size() {
-    if (this.valid) {
-      var ini = ImageSource(this.url);
+    const ini = ImageSource.Get(this.url);
+    if (ini.valid) {
       return {
         width: ini.width,
         height: ini.height,
@@ -48,8 +43,8 @@ export default class LayerImage {
   }
 
   Draw(context) {
-    var cache = ImageSource(this.url);
-    if (cache.state == SourceState.Loaded) {
+    var cache = ImageSource.Get(this.url);
+    if (cache.valid) {
       const x_offset = RenderInfo.Zoom((this.offset.x / this.ppi.x) * PPI);
       const y_offset = RenderInfo.Zoom((this.offset.y / this.ppi.y) * PPI);
       const x = RenderInfo.offset.x - x_offset;

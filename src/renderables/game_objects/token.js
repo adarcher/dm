@@ -1,11 +1,6 @@
 import { observable, computed } from 'mobx';
 import { RenderInfo } from '../../render_info';
-import {
-  ImageSource,
-  PathSource,
-  InitialsSource,
-  SourceState,
-} from './image_source';
+import { ImageSource, PathSource, InitialsSource } from './image_source';
 import {
   GRID_WIDTH,
   TOKEN_BORDER_WIDTH,
@@ -25,13 +20,13 @@ export class TokenBase {
 
   @computed get source() {
     if (this.url) {
-      var img = ImageSource(this.url);
-      if (img.state == SourceState.Loaded) {
+      var img = ImageSource.Get(this.url);
+      if (img.valid) {
         return img;
       }
     } else if (this.path_info && this.path_info.path) {
       var ini = PathSource(this.path_info);
-      if (ini.state == SourceState.Loaded) {
+      if (ini.valid) {
         return ini;
       }
     }

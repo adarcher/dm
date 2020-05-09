@@ -3,7 +3,7 @@ import { RenderInfo } from '../../render_info';
 import Grabbable from './grabbable';
 import HorizontalDimension from './horizontal_dimension';
 import VerticalDimension from './vertical_dimension';
-import { ImageSource, SourceState } from '../game_objects/image_source';
+import { ImageSource } from '../game_objects/image_source';
 
 @Grabbable
 export default class BoundingBox {
@@ -13,8 +13,8 @@ export default class BoundingBox {
   }
 
   FromLayer(layer) {
-    var ini = ImageSource(layer.background.url);
-    if (ini.state == SourceState.Loaded) {
+    var ini = ImageSource.Get(layer.background.url);
+    if (ini.valid) {
       this.vertical.FromLayer(layer);
       this.horizontal.FromLayer(layer);
       this.visible = true;

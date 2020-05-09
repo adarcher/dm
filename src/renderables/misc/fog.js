@@ -10,7 +10,7 @@ export default class Fog extends Node {
   image_sources = [];
   colors = [undefined];
 
-  ImageSource(level) {
+  CoverSource(level) {
     return this.image_sources.length >= level
       ? this.image_sources[level - 1]
       : false;
@@ -151,7 +151,7 @@ export default class Fog extends Node {
   }
 
   SetPattern(level, context) {
-    var image_source = this.ImageSource(level);
+    var image_source = this.CoverSource(level);
     if (image_source) {
       var patternCanvas = image_source.canvas;
       const x = RenderInfo.offset.x;

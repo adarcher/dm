@@ -288,11 +288,13 @@ div::-webkit-scrollbar:hover {
   max-width: 87%;
 }
 
-.layer-list-name .bp3-button-text,
-.token-list-name .bp3-button-text {
+/* .layer-list-name .bp3-button-text, */
+/* .token-list-name .bp3-button-text { */
+.bp3-button-text {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  text-align: left;
 }
 
 .space-between > * {
@@ -341,4 +343,23 @@ input[type='number']::-webkit-outer-spin-button {
 ul {
   max-height: 400px;
   overflow-y: auto;
+}
+
+.queue-item {
+  max-width: 300px;
+  display: flex;
+  margin: 10px !important;
+  padding: 5px !important;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.image-queue {
+  position: absolute;
+  top: 30px;
+  right: 0;
+}
+.image-queue * {
+  margin-right: 5px;
+  /* overflow: hidden; */
 }

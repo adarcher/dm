@@ -1,14 +1,26 @@
 import Enum from '../../misc/enum';
 import { TOKEN_TEXT_SIZE, PPI, SVG_DUMMY } from '../../misc/constants';
-import { observable } from 'mobx';
+import { observable, computed } from 'mobx';
 import { useState, useMemo } from 'react';
 import { Intent } from '@blueprintjs/core';
 import { RenderInfo } from '../../render_info';
 import { Renderer } from '../../renderer';
 
-export const SourceState = Enum(['Loaded', 'Invalid', 'Loading']);
+export const SourceState = Enum(['Init', 'Loaded', 'Invalid', 'Loading']);
 
 class Source {
+  @observable state = SourceState.Init;
+
+  get valid() {
+    if (this.state == SourceState.Init) {
+      this.state = SourceState.Loading;
+      this.Load();
+    }
+    return this.state == SourceState.Loaded;
+  }
+
+  Load() {}
+
   get width() {
     return this.canvas.width;
   }
@@ -16,9 +28,10 @@ class Source {
     return this.canvas.height;
   }
 
-  #data = false;
+  #data = '';
   get data() {
     if (!this.#data) {
+      //// CORS
       //   this.#data = this.canvas.toDataURL();
     }
     return this.#data;
@@ -38,7 +51,9 @@ class Source {
   }
 }
 
-class IS extends Source {
+export class ImageSource extends Source {
+  @observable static cache = {};
+
   // Don't allow reassigning url
   constructor(url) {
     super();
@@ -47,7 +62,6 @@ class IS extends Source {
   canvas = document.createElement('canvas');
   image = new Image();
   #url = '';
-  @observable state = SourceState.Loading;
 
   get url() {
     return this.#url;
@@ -75,18 +89,20 @@ class IS extends Source {
     };
     this.image.src = this.url;
   }
-}
 
-const image_lookup = {};
-export const ImageSource = url => {
-  var img = image_lookup[url];
-  if (!img) {
-    img = new IS(url);
-    img.Load();
-    image_lookup[url] = img;
+  static Get = url => {
+    var img = this.cache[url];
+    if (!img) {
+      img = new ImageSource(url);
+      // img.Load();
+      this.cache[url] = img;
+    }
+    return img;
+  };
+  @computed static get Queue() {
+    return Object.values(this.cache).filter(is => is.state == is.Loading);
   }
-  return img;
-};
+}
 
 // path_info: <path, size, ppi, color>
 class P extends Source {
@@ -148,7 +164,6 @@ class P extends Source {
       context.stroke(shape);
       context.globalAlpha = 0.5;
       context.fill(shape);
-      this.state = SourceState.Loaded;
     }
     return c;
   }
@@ -160,7 +175,6 @@ class P extends Source {
   #x;
   #y;
   #scale;
-  @observable state = SourceState.Loading;
 
   get path() {
     return this.#path;
@@ -176,7 +190,8 @@ class P extends Source {
   }
 
   Load() {
-    this.canvas;
+    // Lazy load lod as needed
+    this.state = SourceState.Loaded;
   }
 }
 
@@ -186,7 +201,6 @@ export const PathSource = path_info => {
   var path = path_lookup[key];
   if (!path) {
     path = new P(path_info);
-    path.Load();
     path_lookup[key] = path;
   }
   return path;
@@ -201,27 +215,22 @@ class Ini extends Source {
 
   canvas = document.createElement('canvas');
   #name;
-  @observable state = SourceState.Loading;
 
   get name() {
     return this.#name;
   }
 
   Load() {
-    new Promise(resolve => {
-      this.canvas.width = 192;
-      this.canvas.height = 192;
-      this.canvas.id = `TOKEN_${this.#name}`;
+    this.canvas.width = 192;
+    this.canvas.height = 192;
+    this.canvas.id = `TOKEN_${this.#name}`;
 
-      const context = this.canvas.getContext('2d');
-      context.font = `bold ${TOKEN_TEXT_SIZE}px serif`;
-      context.fillStyle = 'black';
-      context.textBaseline = 'middle';
-      context.textAlign = 'center';
-      context.fillText(this.#name, 192 / 2, 192 * 0.55);
-
-      resolve();
-    });
+    const context = this.canvas.getContext('2d');
+    context.font = `bold ${TOKEN_TEXT_SIZE}px serif`;
+    context.fillStyle = 'black';
+    context.textBaseline = 'middle';
+    context.textAlign = 'center';
+    context.fillText(this.#name, 192 / 2, 192 * 0.55);
   }
 }
 
@@ -230,7 +239,6 @@ export const InitialsSource = name => {
   var ini = initials_lookup[n];
   if (!ini) {
     ini = new Ini(n);
-    ini.Load();
     initials_lookup[n] = ini;
   }
   return ini;
@@ -238,7 +246,7 @@ export const InitialsSource = name => {
 
 export function useUrl(obj) {
   const [url, setURL] = useState(() => obj.url);
-  const is = useMemo(() => ImageSource(obj.url));
+  const is = useMemo(() => ImageSource.Get(obj.url));
   const [image_tmp_delay, SetImageTmpDelay] = useState(0);
   const urlValid = useMemo(() => {
     switch (is.state) {
