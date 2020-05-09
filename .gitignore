@@ -1,0 +1,7 @@
+**/.DS_Store
+node_modules
+.vscode
+/build
+stats.json
+src/tools/test.json
+src/tools/mapping.mjs
