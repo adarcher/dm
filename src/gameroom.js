@@ -208,6 +208,9 @@ class GameRoomSingleton {
     let current_state = this.Save();
     if (this.previous_state) {
       const diff = Diff(this.previous_state, current_state);
+      if (diff) {
+        diff.board_id = current_state.board_id;
+      }
       const d_json = JSON.stringify(diff);
       const p_json = JSON.stringify(this.states[this.states.length - 1]);
       if (d_json != p_json) {
@@ -241,7 +244,10 @@ class GameRoomSingleton {
     delete this.listeners[name];
   }
   PublishStateChanged() {
-    Object.values(this.listeners).forEach(f => f(this.previous_state));
+    // Object.values(this.listeners).forEach(f => f(this.previous_state));
+    const state = this.states[this.states.length - 1];
+    // state.board_id = this.board_id;
+    Object.values(this.listeners).forEach(f => f(state));
   }
 
   checkers = {};

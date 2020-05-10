@@ -31,6 +31,7 @@ export const Diff = (a, b, names = true) => {
     });
     // If there is a name, that's used to help load the raw
     if (names && b.name != undefined) {
+      //} && is_different) {
       d.name = b.name;
       is_different = true;
     }
