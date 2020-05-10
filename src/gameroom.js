@@ -147,7 +147,7 @@ class GameRoomSingleton {
     const width = Math.max(100, ...widths);
     const left = width * margin;
     const zone = width * (1 - 2 * margin);
-    return Math.round(left + Math.random() * zone);
+    return left + Math.random() * zone;
   };
   RandomV = (margin = 0.1) => {
     const board = this.board;
@@ -157,7 +157,7 @@ class GameRoomSingleton {
     const height = Math.max(100, ...heights);
     const top = height * margin;
     const zone = height * (1 - 2 * margin);
-    return Math.round(top + Math.random() * zone);
+    return top + Math.random() * zone;
   };
 
   AddBoard = () => {

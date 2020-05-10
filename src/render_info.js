@@ -265,11 +265,11 @@ class RenderInfoSingleton {
   };
 
   UpdateOffsetFromCenter(center) {
-    this.offset.x = Math.round(this.center_arm.x - this.zoom * center.x);
-    this.offset.y = Math.round(this.center_arm.y - this.zoom * center.y);
+    this.offset.x = this.center_arm.x - this.zoom * center.x;
+    this.offset.y = this.center_arm.y - this.zoom * center.y;
 
-    this.center.x = Math.round(center.x);
-    this.center.y = Math.round(center.y);
+    this.center.x = center.x;
+    this.center.y = center.y;
 
     this.Update(false);
     // this.grid_start.x = this.offset.x % this.grid_delta;
