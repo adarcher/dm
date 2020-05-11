@@ -245,8 +245,9 @@ export const InitialsSource = name => {
 };
 
 export function useUrl(obj) {
+  console.log(`useURL: ${obj.url}`);
   const [url, setURL] = useState(() => obj.url);
-  const is = useMemo(() => ImageSource.Get(obj.url));
+  const is = ImageSource.Get(obj.url);
   const [image_tmp_delay, SetImageTmpDelay] = useState(0);
   const urlValid = useMemo(() => {
     switch (is.state) {

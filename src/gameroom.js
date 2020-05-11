@@ -6,6 +6,7 @@ import { LoadIntoArray, Diff, Combine } from './renderables/misc/common';
 import { LS_PREFIX, MAX_STATES } from './misc/constants';
 import { Renderer } from './renderer';
 import { Networking } from './networking/websocket';
+import Layer from './renderables/game_objects/layer';
 
 // There can only be one Room open per webpage, export a singleton
 class GameRoomSingleton {
@@ -164,6 +165,7 @@ class GameRoomSingleton {
     this.boards.push(new Board());
   };
 
+  @action
   DeleteBoard = id => {
     const active_board = this.boards[this.board_id];
     const active_id = active_board.index;
@@ -176,6 +178,7 @@ class GameRoomSingleton {
     this.board.layers.push(new Layer());
   };
 
+  @action
   DeleteLayer = id => {
     const board = this.board;
     const active_layer = board.layers[board.layer_id];
@@ -246,7 +249,6 @@ class GameRoomSingleton {
   PublishStateChanged() {
     // Object.values(this.listeners).forEach(f => f(this.previous_state));
     const state = this.states[this.states.length - 1];
-    // state.board_id = this.board_id;
     Object.values(this.listeners).forEach(f => f(state));
   }
 

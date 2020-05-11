@@ -21,8 +21,7 @@ const LayerInfo = observer(props => {
 
   const [open, SetOpen] = useState(() => false);
 
-  const [url, urlValid, handleURL] = useUrl(layer.background);
-  const [url_dm, urlValid_dm, handleURL_dm] = useUrl(layer.background_dm);
+  console.log(`LayerInfo: ${layer.name}`);
 
   return (
     <Callout intent={intent} icon={null}>
@@ -46,33 +45,46 @@ const LayerInfo = observer(props => {
           </span>
         </div>
         <Collapse isOpen={open} className='layer-info'>
-          <FormGroup inline={false} label='Name'>
-            <SInput
-              onChange={layer.OnNameChange}
-              placeholder='Layer Name...'
-              value={layer.name}
-            />
-          </FormGroup>
-          <FormGroup inline={false} label='Image URL'>
-            <SInput
-              onChange={handleURL}
-              placeholder='url...'
-              value={url}
-              intent={urlValid}
-            />
-          </FormGroup>
-          <FormGroup inline={false} label='Image URL (dm)'>
-            <SInput
-              onChange={handleURL_dm}
-              placeholder='url... (dm)'
-              value={url_dm}
-              intent={urlValid_dm}
-            />
-          </FormGroup>
-          <GridInfo {...props} />
+          <LayerPanel {...props} />
         </Collapse>
       </FormGroup>
     </Callout>
+  );
+});
+
+const LayerPanel = observer(props => {
+  const layer = props.layer;
+  const [url, urlValid, handleURL] = useUrl(layer.background);
+  const [url_dm, urlValid_dm, handleURL_dm] = useUrl(layer.background_dm);
+
+  return (
+    <>
+      {' '}
+      <FormGroup inline={false} label='Name'>
+        <SInput
+          onChange={layer.OnNameChange}
+          placeholder='Layer Name...'
+          value={layer.name}
+        />
+      </FormGroup>
+      <FormGroup inline={false} label='Image URL'>
+        <SInput
+          onChange={handleURL}
+          placeholder='url...'
+          value={url}
+          intent={urlValid}
+        />
+      </FormGroup>
+      <FormGroup inline={false} label='Image URL (dm)'>
+        <SInput
+          onChange={handleURL_dm}
+          placeholder='url... (dm)'
+          value={url_dm}
+          intent={urlValid_dm}
+        />
+      </FormGroup>
+      <GridInfo {...props} />
+    </>
   );
 });
 

@@ -15,6 +15,11 @@ if (filename) {
     board.tags = [m.section];
     board.focus = m.center;
 
+    const grid = {
+      width: Math.round(m.image_width / m.ppi.x),
+      height: Math.round(m.image_height / m.ppi.y),
+    };
+
     board.layers = m.layers.map((l, i) => {
       const layer = {};
       layer.name = `Layer ${i}`;
@@ -24,6 +29,8 @@ if (filename) {
         ppi: m.ppi,
         offset: m.offset,
       };
+
+      layer.grid = grid;
 
       const temp = (l.image || '').split('/');
       temp.push('dm.' + temp.pop());

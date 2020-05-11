@@ -21,13 +21,8 @@ import LayerInfo from './layer_info.react';
 const Options = props => {
   return (
     <Menu>
-      {props.items.map(name => (
-        <MenuItem
-          key={name}
-          value={name}
-          text={name}
-          onClick={() => props.handle(name)}
-        />
+      {props.items.map(b => (
+        <MenuItem key={b.key} value={b} text={b.name} onClick={b.OnActivate} />
       ))}
     </Menu>
   );
@@ -38,11 +33,7 @@ const Edit = observer(props => {
   const layers = useMemo(() => board.layers, [board.layers]);
   const name = useMemo(() => board.name, [board.name]);
 
-  const board_names = useMemo(() => GameRoom.boards.map(b => b.name));
-
-  const ActivateBoard = name => {
-    GameRoom.board_id = GameRoom.boards.findIndex(b => b.name == name);
-  };
+  const boards = useMemo(() => GameRoom.boards);
 
   return (
     <Drawer
@@ -69,18 +60,12 @@ const Edit = observer(props => {
                 value={name}
               />
               <Popover
-                content={
-                  <Options
-                    items={board_names}
-                    handle={ActivateBoard}
-                    {...props}
-                  />
-                }
+                content={<Options items={boards} />}
                 minimal={true}
                 position='bottom'
                 usePortal={false}
               >
-                <SButton icon='caret-down' disabled={board_names.length == 0} />
+                <SButton icon='caret-down' disabled={boards.length == 0} />
               </Popover>
               <SButton onClick={board.OnDelete} icon='delete' />
             </ButtonGroup>
