@@ -15,6 +15,7 @@ export default class Layer {
   @observable visible = true;
   @observable background = new LayerImage();
   @observable background_dm = new LayerImage();
+  @observable use_dm = false;
   @observable grid = { width: 33, height: 45 };
   @observable fog = new Fog(10, 10);
   @observable effects = new GroundEffects();
@@ -79,7 +80,8 @@ export default class Layer {
     layer_context.canvas.width = width;
     layer_context.canvas.height = height;
 
-    if (GameRoom.dm && this.background_dm.valid) {
+    if (GameRoom.dm && this.use_dm) {
+      this.background.ready;
       this.background_dm.Draw(layer_context);
     } else {
       this.background.Draw(layer_context);

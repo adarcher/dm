@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ButtonGroup,
   FormGroup,
@@ -57,6 +57,7 @@ const LayerPanel = observer(props => {
   const [url, urlValid, handleURL] = useUrl(layer.background);
   const [url_dm, urlValid_dm, handleURL_dm] = useUrl(layer.background_dm);
 
+  const dm = useMemo(() => layer.use_dm);
   return (
     <>
       {' '}
@@ -75,7 +76,20 @@ const LayerPanel = observer(props => {
           intent={urlValid}
         />
       </FormGroup>
-      <FormGroup inline={false} label='Image URL (dm)'>
+      <FormGroup
+        inline={false}
+        label={
+          <>
+            Image URL (dm)
+            {'  '}
+            <SButton
+              text='DM'
+              active={dm}
+              onClick={() => (layer.use_dm = !dm)}
+            />
+          </>
+        }
+      >
         <SInput
           onChange={handleURL_dm}
           placeholder='url... (dm)'

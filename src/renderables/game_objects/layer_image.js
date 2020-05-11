@@ -9,6 +9,10 @@ export default class LayerImage {
   @observable offset = { x: 17.312186908549947, y: 11.754145065933258 };
   // @observable rotation = 0;
 
+  get state() {
+    return ImageSource.Get(this.url).state;
+  }
+
   get valid() {
     return ImageSource.Get(this.url).valid;
   }

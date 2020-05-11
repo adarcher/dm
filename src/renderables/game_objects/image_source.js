@@ -1,7 +1,7 @@
 import Enum from '../../misc/enum';
 import { TOKEN_TEXT_SIZE, PPI, SVG_DUMMY } from '../../misc/constants';
 import { observable, computed } from 'mobx';
-import { useState, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { Intent } from '@blueprintjs/core';
 import { RenderInfo } from '../../render_info';
 import { Renderer } from '../../renderer';
@@ -91,11 +91,11 @@ export class ImageSource extends Source {
   }
 
   static Get = url => {
-    var img = this.cache[url];
+    const key = `IS: ${url}`;
+    var img = this.cache[key];
     if (!img) {
       img = new ImageSource(url);
-      // img.Load();
-      this.cache[url] = img;
+      this.cache[key] = img;
     }
     return img;
   };
@@ -245,26 +245,34 @@ export const InitialsSource = name => {
 };
 
 export function useUrl(obj) {
-  console.log(`useURL: ${obj.url}`);
-  const [url, setURL] = useState(() => obj.url);
-  const is = ImageSource.Get(obj.url);
+  const [url, setUrl] = useState(obj.url);
+  const [urlValid, setUrlValid] = useState(Intent.NONE);
   const [image_tmp_delay, SetImageTmpDelay] = useState(0);
-  const urlValid = useMemo(() => {
-    switch (is.state) {
-      case SourceState.Loaded:
-        return Intent.NONE;
-      case SourceState.Loading:
-        return Intent.WARNING;
-      default:
-        return Intent.DANGER;
-    }
-  });
-  const handleURL = event => {
+
+  function handleUrl(event) {
     clearTimeout(image_tmp_delay);
     const val = event.target.value;
     SetImageTmpDelay(setTimeout(() => (obj.url = val), 1000));
-    setURL(val);
-  };
+    setUrl(val);
+    setUrlValid(Intent.WARNING);
+  }
 
-  return [url, urlValid, handleURL];
+  useEffect(() => {
+    switch (obj.state) {
+      case SourceState.Loaded:
+        setUrlValid(Intent.SUCCESS);
+        break;
+      case SourceState.Init:
+        setUrlValid(Intent.NONE);
+        break;
+      case SourceState.Loading:
+        setUrlValid(Intent.WARNING);
+        break;
+      default:
+        setUrlValid(Intent.DANGER);
+        break;
+    }
+  });
+
+  return [url, urlValid, handleUrl];
 }
