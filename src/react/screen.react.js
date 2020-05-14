@@ -21,6 +21,12 @@ export class Screen extends React.Component {
 
     this.user_id = Networking.GenerateRoomId();
     window.requestAnimationFrame(this.Draw);
+
+    if (props.join) {
+      console.log(`JOIN: ${props.join}`);
+      this.join_id = props.join;
+      // this.mode = Modes.Join;
+    }
   }
 
   // This is the 2d canvas reference for rendering the game
@@ -45,7 +51,7 @@ export class Screen extends React.Component {
       case Modes.Join:
         return <Join screen={this} />;
       default:
-        return <Welcome screen={this} />;
+        return <Welcome screen={this} join_id={this.join_id} />;
     }
   };
 

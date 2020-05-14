@@ -144,6 +144,7 @@ export default class Player extends TokenBase {
     const key = `player: ${name}`;
     const raw = GameRoom.player.Save();
     localStorage[key] = JSON.stringify(raw);
+    localStorage.player_name = name;
     return raw;
   }
 
@@ -158,5 +159,9 @@ export default class Player extends TokenBase {
       backup_names.push(JSON.parse(old).player.name);
     }
     return backup_names;
+  }
+
+  static get LastUsedName() {
+    return localStorage.player_name || '';
   }
 }

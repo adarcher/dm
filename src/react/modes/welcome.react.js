@@ -17,9 +17,14 @@ import Player from '../../renderables/game_objects/player';
 const Modes = Enum(['Host', 'Join']);
 
 export default function Welcome(props) {
-  const [mode, SetMode] = React.useState(Modes.Host);
-  const [room_id, SetRoomId] = React.useState('0');
-  const [player_name, SetPlayerName] = React.useState('');
+  console.log(JSON.stringify(props.join_id));
+  const [mode, SetMode] = React.useState(
+    props.join_id ? Modes.Join : Modes.Host
+  );
+  const [room_id, SetRoomId] = React.useState(props.join_id || '');
+  const [player_name, SetPlayerName] = React.useState(
+    Player.LastUsedName || ''
+  );
 
   // Random Scrolling
   const Pan = () => {
@@ -89,6 +94,7 @@ export default function Welcome(props) {
                 name={player_name}
                 SetPlayerName={SetPlayerName}
                 SetRoomId={SetRoomId}
+                room_id={room_id}
               />
             }
           />
@@ -99,21 +105,28 @@ export default function Welcome(props) {
   );
 }
 
-//
-//{`${props.screen.user_id}`}</div>
-
 const HostPanel = props => {
+  const CreateJoinLink = () => {
+    const link = `${window.location.toString()}?join=${props.screen.user_id}`;
+    navigator.clipboard.writeText(link);
+  };
+
   return (
     <div className='WelcomePanel'>
       <div className='centered'>
         <div>Share this Room ID:</div>
         <div id='host_id_span'>
-          <Button
-            large={true}
-            text={props.screen.user_id}
-            icon='clipboard'
-            onClick={() => navigator.clipboard.writeText(props.screen.user_id)}
-          />
+          <ButtonGroup>
+            <Button
+              large={true}
+              text={props.screen.user_id}
+              icon='clipboard'
+              onClick={() =>
+                navigator.clipboard.writeText(props.screen.user_id)
+              }
+            />
+            <Button large={true} icon='link' onClick={CreateJoinLink} />
+          </ButtonGroup>
         </div>
         <br />
       </div>
@@ -179,6 +192,7 @@ const JoinPanel = props => {
         <InputGroup
           id='room-input'
           placeholder='Room ID'
+          value={props.room_id}
           onChange={handleRoomIdChange}
         />
         <br />
