@@ -49,7 +49,7 @@ if (filename) {
             token.url = t.url;
             token.color = t.color;
             token.visible = t.visible;
-            token.size = t.size;
+            token.size = Array.isArray(t.size) ? t.size[0] : t.size;
             return token;
           })
         : [];
