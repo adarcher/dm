@@ -16,10 +16,10 @@ import Player from '../../../renderables/game_objects/player';
 const PlayerTokenInfo = observer(props => {
   const [open, SetOpen] = useState(() => false);
 
-  const player = useMemo(() => props.player);
+  const player = props.player;
   const token = useMemo(() => GameRoom.tokens.find(t => t.name == player.name));
 
-  const color = useMemo(() => player.color);
+  const color = player.color;
   const [url, urlValid, handleURL] = useUrl(player);
 
   const run = useMemo(() => player.run);
@@ -109,12 +109,13 @@ const PlayerTokenInfo = observer(props => {
   );
 });
 
-const PlayerVisionInfo = props => {
-  const player = useMemo(() => props.player);
+const PlayerVisionInfo = observer(props => {
+  const player = props.player;
 
   const light = useMemo(() => player.vision[0]);
   const dim = useMemo(() => player.vision[1]);
   const dark = useMemo(() => player.vision[2]);
+
   const lightDistance = e => (player.vision[0] = Math.max(0, e.target.value));
   const dimDistance = e => (player.vision[1] = Math.max(0, e.target.value));
   const darkDistance = e => (player.vision[2] = Math.max(0, e.target.value));
@@ -146,6 +147,6 @@ const PlayerVisionInfo = props => {
       </FormGroup>
     </React.Fragment>
   );
-};
+});
 
 export default PlayerTokenInfo;
