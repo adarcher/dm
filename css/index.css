@@ -2,7 +2,7 @@ body {
   background: #d2d2d2;
   margin: 0px;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  color: #2f2f2f;
+  color: #111111;
   width: 100%;
   min-height: 100%;
   padding: 0px;
@@ -57,7 +57,7 @@ div::-webkit-scrollbar:hover {
 .window {
   font-size: 10px;
   min-width: 100px;
-  background: #2f2f2f;
+  background: #111111;
   color: #c2c2c2;
   border-radius: 4px;
   position: absolute;
@@ -99,8 +99,12 @@ div::-webkit-scrollbar:hover {
   flex: 1 auto;
 }
 
+#ui_container * {
+  pointer-events: all;
+}
+
 .ui {
-  background: #2f2f2f;
+  background: #111111;
   /* color: #c2c2c2; */
   pointer-events: all;
   display: inline-block;
@@ -124,7 +128,7 @@ div::-webkit-scrollbar:hover {
 #recenter:hover {
   opacity: 1;
   color: #c2c2c2;
-  background: #2f2f2f;
+  background: #111111;
 }
 
 #welcome_container,
@@ -240,13 +244,13 @@ div::-webkit-scrollbar:hover {
   margin: 0 2px;
 }
 
-.double-num {
+.formatted {
   margin-bottom: 5px;
   flex-direction: row;
   align-content: center;
 }
 
-.double-num label {
+.formatted label {
   flex: 1;
   display: inline-block;
   text-align: right;
@@ -255,7 +259,11 @@ div::-webkit-scrollbar:hover {
   margin-bottom: 0 !important;
 }
 
-.double-num div {
+.formatted > div {
+  flex: 1;
+}
+
+.double-num > div {
   flex: 4;
 }
 
@@ -295,6 +303,11 @@ div::-webkit-scrollbar:hover {
   white-space: nowrap;
   overflow: hidden;
   text-align: left;
+}
+
+.bp3-button:disabled,
+.bp3-button.bp3-disabled {
+  cursor: default !important;
 }
 
 .space-between > * {
@@ -362,4 +375,52 @@ ul {
 .image-queue * {
   margin-right: 5px;
   /* overflow: hidden; */
+}
+
+.tab-icon {
+  width: 30px;
+  height: 30px;
+  padding: 7px;
+  margin-right: 4px !important;
+}
+
+.dm-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.dm-tools {
+  /* margin-top: 32px;
+  position: fixed !important;
+  z-index: 0; */
+  /* max-height: 90%; */
+  background: #111111 !important;
+}
+
+.bp3-overlay {
+  /* width: 0px !important; */
+  /* z-index: 0 !important; */
+  /* pointer-events: none; */
+}
+
+.test {
+  display: block;
+  width: 0;
+  height: 100%;
+  position: relative;
+}
+
+.bp3-tab-panel {
+  width: 100%;
+}
+
+.info-panel {
+  align-items: center;
+}
+
+canvas.token-image-preview {
+  position: absolute;
+  height: 100%;
+  top: 0;
+  right: 40;
 }
