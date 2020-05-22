@@ -11,6 +11,7 @@ import {
   Popover,
   MenuItem,
   Menu,
+  Switch,
 } from '@blueprintjs/core';
 import { observer } from 'mobx-react';
 import { GameRoom } from '../../../gameroom';
@@ -35,6 +36,9 @@ const Edit = props => {
 
   const boards = useMemo(() => GameRoom.boards);
 
+  const hidden = useMemo(() => GameRoom.hidden);
+  const ToggleHidden = () => (GameRoom.hidden = !GameRoom.hidden);
+
   return (
     <>
       <FormGroup inline={false}>
@@ -53,8 +57,14 @@ const Edit = props => {
             <SButton icon='caret-down' disabled={boards.length == 0} />
           </Popover>
           <SButton onClick={board.OnDelete} icon='delete' />
+          <SButton onClick={GameRoom.AddBoard} icon='add' />
         </ButtonGroup>
       </FormGroup>
+      <Switch
+        checked={hidden}
+        label='Hidden to Players'
+        onChange={ToggleHidden}
+      />
       <FormGroup inline={false}>
         <TextArea
           placeholder='And the story goes... (Not implemented)'

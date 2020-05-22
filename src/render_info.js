@@ -53,6 +53,8 @@ class RenderInfoSingleton {
 
   location = { x: 0, y: 0 };
 
+  hidden = false;
+
   // Not used
   @observable rotation = 90;
   @observable grid_on = true;

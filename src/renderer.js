@@ -29,6 +29,21 @@ class RendererSingleton {
       this.frame_time = now;
     }
     this.dirty = false;
+    if (!GameRoom.dm && GameRoom.hidden) {
+      const context = canvas.getContext('2d');
+      context.fillStyle = 'black';
+      context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+      context.font = `bold 32px serif`;
+      context.fillStyle = 'white';
+      context.textBaseline = 'middle';
+      context.textAlign = 'center';
+      context.fillText(
+        'DM is working on something...',
+        context.canvas.width / 2,
+        context.canvas.height * 0.55
+      );
+      return;
+    }
 
     var board = GameRoom.board;
     if (!board) {

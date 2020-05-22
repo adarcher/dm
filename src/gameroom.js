@@ -18,6 +18,7 @@ class GameRoomSingleton {
   room = undefined;
 
   // @observable dm = true;
+  @observable hidden = false;
 
   @observable boards = [new Board()];
   @observable board_id = 0;
@@ -48,6 +49,9 @@ class GameRoomSingleton {
     if (raw.id != undefined) {
       this.id = raw.id;
     }
+    if (raw.hidden != undefined) {
+      this.hidden = raw.hidden;
+    }
     // Players;
   }
 
@@ -55,6 +59,7 @@ class GameRoomSingleton {
     return {
       boards: this.boards.map(b => b.Save()),
       board_id: this.board_id,
+      hidden: this.hidden,
       // effects:
       // players:
     };
