@@ -109,6 +109,12 @@ export default class Layer {
   OnMoveDown = () => GameRoom.MoveLayer(this.index, 1);
   ToggleVisible = () => (this.visible = !this.visible);
 
+  OnResizeGrid = () => {
+    const bg = this.background;
+    this.grid.width = Math.floor(bg.size.width / bg.ppi.x);
+    this.grid.height = Math.floor(bg.size.height / bg.ppi.y);
+  };
+
   OnNameChange = event => (this.name = event.target.value);
   OnDescriptionChange = event => (this.description = event.target.value);
 }

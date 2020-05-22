@@ -2,6 +2,7 @@ import { observable } from 'mobx';
 import Layer from './layer';
 import { LoadIntoArray } from '../misc/common';
 import { GameRoom } from '../../gameroom';
+import { GridSizer } from '../widgets/grid_sizer';
 
 let board_count = 0;
 export default class Board {
@@ -10,9 +11,17 @@ export default class Board {
   @observable description = 'No Board Description';
   // Stored in render order: bottom to top
   @observable layers = [new Layer()];
-  @observable layer_id = 0;
+  @observable _layer_id = 0;
   @observable tags = [];
   @observable distance_step = 5;
+
+  get layer_id() {
+    return this._layer_id;
+  }
+  set layer_id(id) {
+    this._layer_id = id;
+    if (GameRoom.dm) GridSizer.FromLayer(GameRoom.layer);
+  }
 
   // From RenderInfo
   focus = { x: 0, y: 0 };

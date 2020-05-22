@@ -36,7 +36,6 @@ class GameRoomSingleton {
 
   @action
   Load(raw) {
-    console.log('Load GameRoom');
     if (raw.boards) {
       this.boards = LoadIntoArray(this.boards, raw.boards, Board);
     }
@@ -72,7 +71,6 @@ class GameRoomSingleton {
     localStorage[`${LS_PREFIX}${backup_count}`] = localStorage.gameroom;
     var current = this.Save();
     localStorage.gameroom = JSON.stringify(current);
-    console.log(`Saved GameRoom`);
   }
 
   LoadFromDisk() {

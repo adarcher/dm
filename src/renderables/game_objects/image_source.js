@@ -6,30 +6,6 @@ import { Intent } from '@blueprintjs/core';
 import { RenderInfo } from '../../render_info';
 import { Renderer } from '../../renderer';
 
-const db_version = 1;
-const image_source_db = 'DM_image_sources';
-const image_source_key = 'url';
-const image_source_object = () => ({ [image_source_key]: '', data: false });
-const db_request = window.indexedDB.open(image_source_db, db_version);
-const db_info = { db: false, init: false };
-
-db_request.onupgradeneeded = e => {
-  const db = e.target.result;
-  db.createObjectStore(image_source_db, { keyPath: image_source_key });
-};
-
-db_request.onerror = e => console.log('IndexedDB failed');
-
-db_request.onsuccess = e => {
-  const db = db_request.result;
-  db.onerror = e => {
-    console.log(`DB_IMG_S: ${e}`);
-  };
-
-  db_info.db = db;
-  db_info.init = true;
-};
-
 export const SourceState = Enum(['Init', 'Loaded', 'Invalid', 'Loading']);
 
 class Source {
@@ -83,7 +59,6 @@ export class ImageSource extends Source {
     this.#url = url;
   }
   canvas = document.createElement('canvas');
-  // #req = new XMLHttpRequest();
   image = new Image();
   #url = '';
 
@@ -92,25 +67,6 @@ export class ImageSource extends Source {
   }
 
   Load() {
-    // console.log(`Load ${this.url}`);
-    // this.#req.onload = () => {
-    //   const blob = this.#req.response;
-
-    //   this.image = window.URL.createObjectURL(blob);
-    //   this.canvas.width = this.image.width;
-    //   this.canvas.height = this.image.height;
-    //   const context = this.canvas.getContext('2d');
-    //   context.drawImage(
-    //     this.image,
-    //     0,
-    //     0,
-    //     this.canvas.width,
-    //     this.canvas.height
-    //   );
-    //   this.state = SourceState.Loaded;
-    //   Renderer.dirty = true;
-
-    // // this.image.crossOrigin = 'use-credentials';
     // this.image.crossOrigin = 'anonymous';
     console.log(`Load ${this.url}`);
     this.image.onload = () => {
@@ -131,12 +87,6 @@ export class ImageSource extends Source {
       this.state = SourceState.Invalid;
     };
     this.image.src = this.url;
-    // };
-
-    // this.#req.open('GET', this.url, true);
-    // this.#req.responseType = 'blob';
-    // this.#req.withCredentials = false;
-    // this.#req.send();
   }
 
   static Get = url => {

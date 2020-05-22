@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import { useMemo } from 'react';
 import { SInputNumber } from '../../components/small_input.react';
 import SButton from '../../components/small_button.react';
+import { GridSizer } from '../../../renderables/widgets/grid_sizer';
 
 const GridInfo = props => {
   const layer = props.layer;
@@ -19,12 +20,12 @@ const GridInfo = props => {
   const width = useMemo(() => layer.grid.width);
   const handleGridWidth = event => {
     layer.grid.width = Number.parseInt(event.target.value);
-    props.boundingBox.Drop();
+    GridSizer.Drop();
   };
   const height = useMemo(() => layer.grid.height);
   const handleGridHeight = event => {
     layer.grid.height = Number.parseInt(event.target.value);
-    props.boundingBox.Drop();
+    GridSizer.Drop();
   };
 
   return (
@@ -45,6 +46,11 @@ const GridInfo = props => {
           />
           <SButton icon='eraser' title='Reset' disabled={!fog} />
           <SButton icon={invertIcon} title='Invert' disabled={!fog} />
+          <SButton
+            icon={invertIcon}
+            title='Invert'
+            onClick={layer.OnResizeGrid}
+          />
         </ButtonGroup>
         <Collapse isOpen={grid}>
           <FormGroup

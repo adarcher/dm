@@ -3,9 +3,9 @@ import { GameRoom } from '../gameroom';
 import Player from '../renderables/game_objects/player';
 import { AddPing } from '../renderables/ping';
 import { RenderInfo } from '../render_info';
+import { GridSizer } from '../renderables/widgets/grid_sizer';
 
 const SendGameState = state => {
-  // console.log('FOCUS: ', state.boards[state.board_id].focus);
   Networking.Send({ game: state });
 };
 
@@ -14,6 +14,8 @@ const SetupHost = id => {
 
   GameRoom.LoadFromDisk();
   GameRoom.dm = true;
+
+  RenderInfo.widgets.push(GridSizer);
 
   Networking.customDataIn = (data, connection) => {
     if (data == 'connected') {

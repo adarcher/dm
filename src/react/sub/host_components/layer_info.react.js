@@ -21,8 +21,6 @@ const LayerInfo = props => {
 
   const [open, SetOpen] = useState(() => false);
 
-  console.log(`LayerInfo: ${layer.name}`);
-
   return (
     <Callout intent={intent} icon={null}>
       <FormGroup>

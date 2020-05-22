@@ -16,9 +16,9 @@ import HostLink from './host_link.react';
 import ArchiveControls from './archive_controls.react';
 import ZoomControls from './zoom_controls.react';
 import HotKeys from './hot_keys.react';
+import MapTools from './map_tools.react';
 
 const TabIcon = toolset => {
-  console.log(`Create Tab: ${toolset}`);
   return (
     <Tab
       key={toolset}
@@ -47,7 +47,6 @@ const DMHeader = props => {
   const JoinActions = () => [TOOLSET.Player];
 
   const ModeActions = () => {
-    console.log(`Showing ${mode} tabs...`);
     switch (mode) {
       case 'Host':
         return HostActions();
@@ -83,6 +82,8 @@ const DMHeader = props => {
           <ArchiveControls key='controls' />,
           <NavbarDivider key='div2' />,
           <HotKeys key='brushes' {...props} />,
+          <NavbarDivider key='div3' />,
+          <MapTools key='map' />,
         ];
       case 'Join':
         return [<HostLink key='link' id={network_id} />];

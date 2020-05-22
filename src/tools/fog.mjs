@@ -334,7 +334,6 @@ export class Node {
   }
 
   Add(x, y, r, state) {
-    console.log('Add', x, y, r, state);
     return this.Modify(state, parseInt(x), parseInt(y), r);
   }
   Remove(x, y, r) {
