@@ -2,7 +2,7 @@ import Enum from './enum';
 
 export const PPI = 96;
 export const GRID_WIDTH = 4;
-export const TOKEN_TEXT_SIZE = 50;
+export const TOKEN_TEXT_SIZE = 100;
 export const TOKEN_BORDER_WIDTH = 1.2 * GRID_WIDTH;
 
 export const FPS_CAP = 60;
@@ -29,3 +29,23 @@ export const SVG_DUMMY = document.createElementNS(
   'http://www.w3.org/2000/svg',
   'svg'
 );
+
+export const TOOLSET = Enum([
+  'None',
+  'Player',
+  'Players',
+  'Board',
+  'Mobs',
+  'Combat',
+  'Closed',
+]);
+
+export const TOOLSET_ICON = {
+  None: 'cross',
+  Player: 'user',
+  Players: 'people',
+  Board: 'clipboard',
+  Mobs: 'people',
+  Combat: 'ninja',
+  Closed: 'drag-handle-vertical',
+};

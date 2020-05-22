@@ -6,7 +6,7 @@ import { useMemo } from 'react';
 import { SInputNumber } from '../../components/small_input.react';
 import SButton from '../../components/small_button.react';
 
-const GridInfo = observer(props => {
+const GridInfo = props => {
   const layer = props.layer;
 
   const [grid, SetGrid] = useState(() => false);
@@ -47,7 +47,11 @@ const GridInfo = observer(props => {
           <SButton icon={invertIcon} title='Invert' disabled={!fog} />
         </ButtonGroup>
         <Collapse isOpen={grid}>
-          <FormGroup className='double-num' inline={false} label='Offset'>
+          <FormGroup
+            className='formatted double-num'
+            inline={false}
+            label='Offset'
+          >
             <Tag className='small-number' icon='caret-right' minimal={true}>
               {layer.background.offset.x}
             </Tag>
@@ -55,7 +59,11 @@ const GridInfo = observer(props => {
               {layer.background.offset.y}
             </Tag>
           </FormGroup>
-          <FormGroup className='double-num' inline={false} label='PPI'>
+          <FormGroup
+            className='formatted double-num'
+            inline={false}
+            label='PPI'
+          >
             <Tag className='small-number' icon='caret-right' minimal={true}>
               {layer.background.ppi.x}
             </Tag>
@@ -63,7 +71,11 @@ const GridInfo = observer(props => {
               {layer.background.ppi.y}
             </Tag>
           </FormGroup>
-          <FormGroup className='double-num' inline={false} label='Size'>
+          <FormGroup
+            className='formatted double-num'
+            inline={false}
+            label='Size'
+          >
             <SInputNumber
               value={width}
               onChange={handleGridWidth}
@@ -81,6 +93,6 @@ const GridInfo = observer(props => {
       </FormGroup>
     </React.Fragment>
   );
-});
+};
 
-export default GridInfo;
+export default observer(GridInfo);

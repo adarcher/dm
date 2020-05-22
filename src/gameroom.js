@@ -5,7 +5,7 @@ import Player from './renderables/game_objects/player';
 import { LoadIntoArray, Diff, Combine } from './renderables/misc/common';
 import { LS_PREFIX, MAX_STATES } from './misc/constants';
 import { Renderer } from './renderer';
-import { Networking } from './networking/websocket';
+import { Networking, NetworkLatency } from './networking/websocket';
 import Layer from './renderables/game_objects/layer';
 
 // There can only be one Room open per webpage, export a singleton
@@ -16,6 +16,8 @@ class GameRoomSingleton {
 
   // Stored full raw data
   room = undefined;
+
+  // @observable dm = true;
 
   @observable boards = [new Board()];
   @observable board_id = 0;
@@ -94,7 +96,7 @@ class GameRoomSingleton {
     };
   }
 
-  @computed get board() {
+  get board() {
     var board = this.boards[this.board_id];
     if (board) {
       return board;
@@ -102,12 +104,12 @@ class GameRoomSingleton {
     return false;
   }
 
-  @computed get distance_step() {
+  get distance_step() {
     var board = this.board;
     return board ? board.distance_step : 5;
   }
 
-  @computed get layer() {
+  get layer() {
     var board = this.board;
     if (board) {
       return board.layers[board.layer_id];
@@ -115,7 +117,7 @@ class GameRoomSingleton {
     return false;
   }
 
-  @computed get tokens() {
+  get tokens() {
     var layer = this.layer;
     if (layer) {
       return layer.tokens;
@@ -123,7 +125,7 @@ class GameRoomSingleton {
     return [];
   }
 
-  @computed get fog() {
+  get fog() {
     var layer = this.layer;
     if (layer) {
       return layer.fog;
@@ -131,7 +133,7 @@ class GameRoomSingleton {
     return false;
   }
 
-  @computed get ground_effects() {
+  get ground_effects() {
     var layer = this.layer;
     if (layer) {
       return layer.effects;
@@ -237,6 +239,12 @@ class GameRoomSingleton {
       this.PublishStateChanged();
       this.current_state_id++;
     }
+
+    [
+      this.latency,
+      this.latency_window,
+      this.latency_size,
+    ] = NetworkLatency.RTStat();
   };
 
   listeners = {};
@@ -285,6 +293,10 @@ class GameRoomSingleton {
       pom.click();
     }
   };
+
+  @observable latency = 0;
+  @observable latency_window = NetworkLatency.window;
+  @observable latency_size = 0;
 }
 
 export const GameRoom = new GameRoomSingleton();

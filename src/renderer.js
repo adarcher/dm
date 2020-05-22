@@ -14,9 +14,20 @@ const GetContext = canvas => {
 class RendererSingleton {
   dirty = false;
 
+  frames = 0;
+  fps = 0;
+  frame_time = 0;
   Render = canvas => {
     GameRoom.CheckState();
     if (!this.dirty || !canvas) return;
+    this.frames++;
+    const now = Date.now();
+    const delta = (now - this.frame_time) / 1000;
+    if (delta > 0.5) {
+      this.fps = this.frames / delta;
+      this.frames = 0;
+      this.frame_time = now;
+    }
     this.dirty = false;
 
     var board = GameRoom.board;

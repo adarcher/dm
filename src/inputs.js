@@ -4,7 +4,7 @@ import { Brush } from './renderables/brush';
 import { AddPing } from './renderables/ping';
 import { Networking } from './networking/websocket';
 
-export const EnableInput = (dom, full_use = false) => {
+export const EnableInput = dom => {
   console.log(`Enabling input listeners on: ${dom}`);
   // Collect MouseEvent data
   const EventData = event => {
@@ -19,7 +19,7 @@ export const EnableInput = (dom, full_use = false) => {
   };
 
   const LayerTokens = () => {
-    if (full_use) {
+    if (GameRoom.dm) {
       return GameRoom.tokens;
     } else {
       return GameRoom.tokens.filter(t => t.name == GameRoom.player.name);
@@ -41,7 +41,7 @@ export const EnableInput = (dom, full_use = false) => {
     // Add a throttle to limit events firering
     const now = Date.now();
     if (now >= lastwheel + 33) {
-      if (full_use) {
+      if (GameRoom.dm) {
         RenderInfo.Update(data, data.up);
       } else {
         RenderInfo.setZoom(data.up);
@@ -66,7 +66,7 @@ export const EnableInput = (dom, full_use = false) => {
     held.forEach(object => object.Pickup());
     if (held.length == 0) {
       Brush.active = true;
-      if (!Brush.Paint() && full_use) {
+      if (!Brush.Paint() && GameRoom.dm) {
         RenderInfo.pan_offset = {
           offset: RenderInfo.offset,
           pan_from: data,

@@ -12,11 +12,12 @@ import { useUrl } from '../../../renderables/game_objects/image_source';
 import SButton from '../../components/small_button.react';
 import SInput, { SInputDistance } from '../../components/small_input.react';
 import Player from '../../../renderables/game_objects/player';
+import TokenPreview from '../token_preview.react';
 
-const PlayerTokenInfo = observer(props => {
+const PlayerTokenInfo = props => {
   const [open, SetOpen] = useState(() => false);
 
-  const player = props.player;
+  const player = GameRoom.player;
   const token = useMemo(() => GameRoom.tokens.find(t => t.name == player.name));
 
   const color = player.color;
@@ -32,28 +33,29 @@ const PlayerTokenInfo = observer(props => {
     token && token.over ? Intent.PRIMARY : Intent.NONE
   );
 
+  const gradient = useMemo(
+    () => `linear-gradient(90deg,${color} 10px, rgba(0,0,0,0) 35px)`,
+    [color]
+  );
+
   const style = useMemo(() => {
     let s = {};
     Object.assign(s, props.style);
     Object.assign(s, {
-      backgroundImage: `linear-gradient(90deg,${color} 10px, rgba(0,0,0,0) 35px), var(${player.source.css})`,
+      backgroundImage: `${gradient}`,
     });
     return s;
   });
 
   return (
-    <Callout
-      intent={intent}
-      icon={null}
-      className='token-callout'
-      style={style}
-    >
+    <Callout icon={null} className='token-callout' style={style}>
       <input
         className='bp3-button token-color'
         type='color'
         value={color}
         onChange={player.OnChangeColor}
       />
+      <TokenPreview token={player} />
       <FormGroup>
         <div className='space-between'>
           <ButtonGroup>
@@ -85,11 +87,15 @@ const PlayerTokenInfo = observer(props => {
               placeholder='url...'
               type='text'
               value={url}
-              intent={urlValid}
+              intent={Intent.NONE}
             />
           </FormGroup>
           <PlayerVisionInfo {...props} />
-          <FormGroup className='double-num' inline={false} label='Travel'>
+          <FormGroup
+            className='formatted double-num'
+            inline={false}
+            label='Travel'
+          >
             <SInputDistance
               value={run}
               onChange={runDistance}
@@ -107,10 +113,10 @@ const PlayerTokenInfo = observer(props => {
       </FormGroup>
     </Callout>
   );
-});
+};
 
-const PlayerVisionInfo = observer(props => {
-  const player = props.player;
+const PlayerVisionInfo = props => {
+  const player = GameRoom.player;
 
   const light = useMemo(() => player.vision[0]);
   const dim = useMemo(() => player.vision[1]);
@@ -124,8 +130,8 @@ const PlayerVisionInfo = observer(props => {
   const dark_color = Player.vision_colors[2];
 
   return (
-    <React.Fragment>
-      <FormGroup className='double-num' inline={false} label='Vision'>
+    <>
+      <FormGroup className='formatted double-num' inline={false} label='Vision'>
         <SInputDistance
           value={light}
           onChange={lightDistance}
@@ -145,8 +151,8 @@ const PlayerVisionInfo = observer(props => {
           leftIcon='full-circle'
         />
       </FormGroup>
-    </React.Fragment>
+    </>
   );
-});
+};
 
-export default PlayerTokenInfo;
+export default observer(PlayerTokenInfo);

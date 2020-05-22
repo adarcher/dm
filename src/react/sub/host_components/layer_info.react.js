@@ -13,7 +13,7 @@ import { useUrl } from '../../../renderables/game_objects/image_source';
 import SInput from '../../components/small_input.react';
 import SButton from '../../components/small_button.react';
 
-const LayerInfo = observer(props => {
+const LayerInfo = props => {
   const layer = props.layer;
   const active = GameRoom.board.layer_id == props.index;
   const intent = active ? Intent.PRIMARY : Intent.NONE;
@@ -50,9 +50,9 @@ const LayerInfo = observer(props => {
       </FormGroup>
     </Callout>
   );
-});
+};
 
-const LayerPanel = observer(props => {
+const LayerPanel = props => {
   const layer = props.layer;
   const [url, urlValid, handleURL] = useUrl(layer.background);
   const [url_dm, urlValid_dm, handleURL_dm] = useUrl(layer.background_dm);
@@ -100,6 +100,6 @@ const LayerPanel = observer(props => {
       <GridInfo {...props} />
     </>
   );
-});
+};
 
-export default LayerInfo;
+export default observer(LayerInfo);

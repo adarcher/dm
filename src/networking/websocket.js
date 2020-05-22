@@ -10,6 +10,46 @@ const DELAYED = 'delayed';
 const MAX_ID = 2176782335; // ZZZZZZ
 const MIN_ID = 60466176; // 100000
 
+const Packet = payload => ({ payload: payload, clock: Date.now() });
+
+class Latencies {
+  history = [];
+  window = 30; // seconds;
+
+  Clean(now = false) {
+    now = now || Date.now();
+    const cutoff = now - 30 * 1000;
+    this.history = this.history.filter(ts => ts.clock > cutoff);
+  }
+
+  Add(delta, now = false, size = 0) {
+    now = now || Date.now();
+    this.history.push({ clock: now, delta: delta, size: size });
+    this.Clean();
+  }
+
+  RTStat() {
+    const now = Date.now();
+    this.Clean(now);
+    const count = this.history.length;
+    if (count > 0) {
+      const average =
+        this.history.map(ts => ts.delta).reduce((sum, d) => d + sum) / count;
+      const first = this.history[0].clock;
+      const last = this.history[Math.max(0, count - 1)].clock;
+      const time_delta = Math.round((last - first) / 1000);
+      const total_data = this.history
+        .map(ts => ts.size)
+        .reduce((sum, d) => d + sum);
+      return [average, time_delta, total_data];
+    } else {
+      return [0, this.window, 0];
+    }
+  }
+}
+
+export let NetworkLatency = new Latencies();
+
 // Room id prefix
 // TBD: grab the current hostname or something
 const PREFIX = 'adarcher_dm_';
@@ -73,9 +113,9 @@ class NetworkingSingleton {
     this.state = CONNECTED;
 
     if (data == 'ping') {
-      connection.send('pong');
+      connection.Send('pong');
     } else if (data == 'connect') {
-      connection.send('connected');
+      connection.Send('connected');
     }
 
     if (this.customDataIn) {
@@ -119,15 +159,21 @@ class NetworkingSingleton {
       current_conn => current_conn.peer != connection.peer
     );
 
+    connection.Send = payload => connection.send(Packet(payload));
+
     // Setup events
     connection.on('open', () => {
       console.log(`WebSocket Connection(${connection.peer}) open.`);
       this.state = CONNECTED;
-      connection.send('connect');
+      connection.Send('connect');
       this.connections.push(connection);
     });
     connection.on('data', data => {
-      this.DataIn(data, connection);
+      const now = Date.now();
+      const size = JSON.stringify(data.payload).length;
+      NetworkLatency.Add(now - data.clock, now, size);
+
+      this.DataIn(data.payload, connection);
     });
     connection.on('error', err => {
       console.log(`WebSocket error(${connection.peer}): ${err}`);
@@ -203,9 +249,10 @@ class NetworkingSingleton {
 
   Send(data, exclude = []) {
     if (this.peer) {
+      const out = Packet(data);
       this.connections.forEach(connection => {
         if (connection.open && !exclude.some(c => c == connection)) {
-          connection.send(data);
+          connection.send(out);
         }
       });
     }

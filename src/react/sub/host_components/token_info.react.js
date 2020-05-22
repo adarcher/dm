@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useReducer, useRef } from 'react';
 import {
   ButtonGroup,
   FormGroup,
@@ -11,8 +11,9 @@ import { useMemo } from 'react';
 import SButton from '../../components/small_button.react';
 import { useUrl } from '../../../renderables/game_objects/image_source';
 import SInput, { SInputNumber } from '../../components/small_input.react';
+import TokenPreview from '../token_preview.react';
 
-const TokenInfo = observer(props => {
+const TokenInfo = props => {
   const [open, SetOpen] = useState(() => false);
 
   const token = useMemo(() => props.token);
@@ -28,14 +29,13 @@ const TokenInfo = observer(props => {
     token.over,
   ]);
 
-  const img_data = useMemo(() => `var(${token.source.css})`, [token.source]);
   const gradient = useMemo(
     () => `linear-gradient(90deg,${color} 10px, rgba(0,0,0,0) 35px)`,
     [color]
   );
 
   const style = useMemo(() => ({
-    backgroundImage: `${gradient}, ${img_data}`,
+    backgroundImage: `${gradient}`,
   }));
 
   return (
@@ -51,6 +51,7 @@ const TokenInfo = observer(props => {
         value={color}
         onChange={token.OnChangeColor}
       />
+      <TokenPreview token={token} />
       <FormGroup>
         <div className='space-between'>
           <ButtonGroup>
@@ -90,10 +91,14 @@ const TokenInfo = observer(props => {
               onChange={handleURL}
               placeholder='url...'
               value={url}
-              intent={urlValid}
+              intent={Intent.NONE}
             />
           </FormGroup>
-          <FormGroup className='double-num' inline={false} label='Position'>
+          <FormGroup
+            className='formatted double-num'
+            inline={false}
+            label='Position'
+          >
             <SInputNumber
               value={x}
               onChange={token.OnXChange}
@@ -107,7 +112,11 @@ const TokenInfo = observer(props => {
               leftIcon='arrows-vertical'
             />
           </FormGroup>
-          <FormGroup className='double-num' inline={false} label='Size'>
+          <FormGroup
+            className='formatted double-num'
+            inline={false}
+            label='Size'
+          >
             <SInputNumber
               value={size}
               onChange={token.OnSizeChange}
@@ -118,6 +127,6 @@ const TokenInfo = observer(props => {
       </FormGroup>
     </Callout>
   );
-});
+};
 
-export default TokenInfo;
+export default observer(TokenInfo);

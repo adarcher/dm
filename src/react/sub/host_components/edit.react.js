@@ -28,7 +28,7 @@ const Options = props => {
   );
 };
 
-const Edit = observer(props => {
+const Edit = props => {
   const board = useMemo(() => GameRoom.board);
   const layers = useMemo(() => board.layers, [board.layers]);
   const name = useMemo(() => board.name, [board.name]);
@@ -36,64 +36,46 @@ const Edit = observer(props => {
   const boards = useMemo(() => GameRoom.boards);
 
   return (
-    <Drawer
-      icon='wrench'
-      title='Game Board Tools'
-      isOpen={props.open}
-      position={Position.LEFT}
-      usePortal={false}
-      autoFocus={true}
-      canEscapeKeyClose={false}
-      canOutsideClickClose={false}
-      enforceFocus={false}
-      hasBackdrop={false}
-      size={Drawer.SIZE_SMALL}
-      onClose={() => props.SetOpen(false)}
-    >
-      <div className={Classes.DRAWER_BODY}>
-        <div className={Classes.DIALOG_BODY}>
-          <FormGroup inline={false} label='Name'>
-            <ButtonGroup>
-              <SInput
-                placeholder='Board Name...'
-                onChange={GameRoom.board.OnNameChange}
-                value={name}
-              />
-              <Popover
-                content={<Options items={boards} />}
-                minimal={true}
-                position='bottom'
-                usePortal={false}
-              >
-                <SButton icon='caret-down' disabled={boards.length == 0} />
-              </Popover>
-              <SButton onClick={board.OnDelete} icon='delete' />
-            </ButtonGroup>
-          </FormGroup>
-          <FormGroup inline={false} label='Description'>
-            <TextArea
-              placeholder='And the story goes... (Not implemented)'
-              small={true}
-              fill={true}
-              value={board.description}
-              onChange={board.OnDescriptionChange}
-            />
-          </FormGroup>
-          <FormGroup vertial={true}>
-            <div className='space-between'>
-              <Label style={{ margin: 0 }}>Layers</Label>
-              <SButton icon='new-layer' onClick={GameRoom.AddLayer} />
-            </div>
-            <Divider />
-            {layers.map((l, i) => (
-              <LayerInfo {...props} layer={l} key={l.key} index={i} />
-            ))}
-          </FormGroup>
+    <>
+      <FormGroup inline={false}>
+        <ButtonGroup>
+          <SInput
+            placeholder='Board Name...'
+            onChange={GameRoom.board.OnNameChange}
+            value={name}
+          />
+          <Popover
+            content={<Options items={boards} />}
+            minimal={true}
+            position='bottom'
+            usePortal={false}
+          >
+            <SButton icon='caret-down' disabled={boards.length == 0} />
+          </Popover>
+          <SButton onClick={board.OnDelete} icon='delete' />
+        </ButtonGroup>
+      </FormGroup>
+      <FormGroup inline={false}>
+        <TextArea
+          placeholder='And the story goes... (Not implemented)'
+          small={true}
+          fill={true}
+          value={board.description}
+          onChange={board.OnDescriptionChange}
+        />
+      </FormGroup>
+      <FormGroup vertial={true}>
+        <div className='space-between'>
+          <Label style={{ margin: 0 }}>Layers</Label>
+          <SButton icon='new-layer' onClick={GameRoom.AddLayer} />
         </div>
-      </div>
-      <div className={Classes.DRAWER_FOOTER} />
-    </Drawer>
+        <Divider />
+        {layers.map((l, i) => (
+          <LayerInfo {...props} layer={l} key={l.key} index={i} />
+        ))}
+      </FormGroup>
+    </>
   );
-});
+};
 
-export default Edit;
+export default observer(Edit);

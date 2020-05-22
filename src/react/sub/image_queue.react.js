@@ -7,7 +7,7 @@ import SButton from '../components/small_button.react';
 import { Spinner } from '@blueprintjs/core';
 import { observer } from 'mobx-react';
 
-const ImageQueue = observer(props => {
+const ImageQueue = props => {
   const queue = useMemo(() =>
     Object.values(ImageSource.cache).filter(
       is => is.state == SourceState.Loading
@@ -21,15 +21,15 @@ const ImageQueue = observer(props => {
       ))}
     </div>
   );
-});
+};
 
-const ImageQueued = observer(props => {
+const ImageQueued = props => {
   const is = props.is;
   return (
     <SButton className='queue-item' icon={<Spinner size={15} />}>
       {is.url}
     </SButton>
   );
-});
+};
 
-export default ImageQueue;
+export default observer(ImageQueue);

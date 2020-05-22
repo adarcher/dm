@@ -6,9 +6,34 @@ import { Intent } from '@blueprintjs/core';
 import { RenderInfo } from '../../render_info';
 import { Renderer } from '../../renderer';
 
+const db_version = 1;
+const image_source_db = 'DM_image_sources';
+const image_source_key = 'url';
+const image_source_object = () => ({ [image_source_key]: '', data: false });
+const db_request = window.indexedDB.open(image_source_db, db_version);
+const db_info = { db: false, init: false };
+
+db_request.onupgradeneeded = e => {
+  const db = e.target.result;
+  db.createObjectStore(image_source_db, { keyPath: image_source_key });
+};
+
+db_request.onerror = e => console.log('IndexedDB failed');
+
+db_request.onsuccess = e => {
+  const db = db_request.result;
+  db.onerror = e => {
+    console.log(`DB_IMG_S: ${e}`);
+  };
+
+  db_info.db = db;
+  db_info.init = true;
+};
+
 export const SourceState = Enum(['Init', 'Loaded', 'Invalid', 'Loading']);
 
 class Source {
+  @observable static cache = {};
   @observable state = SourceState.Init;
 
   get valid() {
@@ -31,8 +56,8 @@ class Source {
   #data = '';
   get data() {
     if (!this.#data) {
-      //// CORS
-      //   this.#data = this.canvas.toDataURL();
+      // // CORS
+      // this.#data = this.canvas.toDataURL();
     }
     return this.#data;
   }
@@ -52,14 +77,13 @@ class Source {
 }
 
 export class ImageSource extends Source {
-  @observable static cache = {};
-
   // Don't allow reassigning url
   constructor(url) {
     super();
     this.#url = url;
   }
   canvas = document.createElement('canvas');
+  // #req = new XMLHttpRequest();
   image = new Image();
   #url = '';
 
@@ -68,6 +92,25 @@ export class ImageSource extends Source {
   }
 
   Load() {
+    // console.log(`Load ${this.url}`);
+    // this.#req.onload = () => {
+    //   const blob = this.#req.response;
+
+    //   this.image = window.URL.createObjectURL(blob);
+    //   this.canvas.width = this.image.width;
+    //   this.canvas.height = this.image.height;
+    //   const context = this.canvas.getContext('2d');
+    //   context.drawImage(
+    //     this.image,
+    //     0,
+    //     0,
+    //     this.canvas.width,
+    //     this.canvas.height
+    //   );
+    //   this.state = SourceState.Loaded;
+    //   Renderer.dirty = true;
+
+    // // this.image.crossOrigin = 'use-credentials';
     // this.image.crossOrigin = 'anonymous';
     console.log(`Load ${this.url}`);
     this.image.onload = () => {
@@ -88,6 +131,12 @@ export class ImageSource extends Source {
       this.state = SourceState.Invalid;
     };
     this.image.src = this.url;
+    // };
+
+    // this.#req.open('GET', this.url, true);
+    // this.#req.responseType = 'blob';
+    // this.#req.withCredentials = false;
+    // this.#req.send();
   }
 
   static Get = url => {
@@ -153,8 +202,8 @@ class P extends Source {
 
       const context = c.getContext('2d');
       context.fillStyle = this.color;
-      context.strokeStyle = this.color;
-      context.lineWidth = (3 * scale) / PPI;
+      context.strokeStyle = 'black'; //this.color;
+      context.lineWidth = (10 * scale) / PPI;
       const p = new Path2D(this.path);
       const shape = new Path2D();
       const transform = SVG_DUMMY.createSVGMatrix()
@@ -162,7 +211,7 @@ class P extends Source {
         .scale(scale / this.ppi);
       shape.addPath(p, transform);
       context.stroke(shape);
-      context.globalAlpha = 0.5;
+      // context.globalAlpha = 0.5;
       context.fill(shape);
     }
     return c;
@@ -231,6 +280,7 @@ class Ini extends Source {
     context.textBaseline = 'middle';
     context.textAlign = 'center';
     context.fillText(this.#name, 192 / 2, 192 * 0.55);
+    this.state = SourceState.Loaded;
   }
 }
 
@@ -241,7 +291,21 @@ export const InitialsSource = name => {
     ini = new Ini(n);
     initials_lookup[n] = ini;
   }
+  ini.Load();
   return ini;
+};
+
+const StateToIntent = state => {
+  switch (state) {
+    case SourceState.Loaded:
+      return Intent.SUCCESS;
+    case SourceState.Init:
+      return Intent.NONE;
+    case SourceState.Loading:
+      return Intent.WARNING;
+    default:
+      return Intent.DANGER;
+  }
 };
 
 export function useUrl(obj) {
@@ -274,5 +338,5 @@ export function useUrl(obj) {
     }
   });
 
-  return [url, urlValid, handleUrl];
+  return [url, urlValid, handleUrl, StateToIntent];
 }

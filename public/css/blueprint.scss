@@ -1,6 +1,5 @@
 // $icon-font-path: "~@blueprintjs/core/resources/icons";
 
-
 //  #2f2f2f Lab: 19.4022 0.1281 -0.3011
 //  #3b3b3b Lab: 25.0719 0.1486 -0.3494
 //  #484848 Lab: 30.7415 0.1691 -0.3976
@@ -17,7 +16,7 @@
 //  #d7d7d7 Lab: 85.9804 0.3690 -0.8674
 //  #e9e9e9 Lab: 92.2980 0.3919 -0.9212
 
-$dark-gray5: #2f2f2f;
+$dark-gray5: #111111;
 $dark-gray4: #3b3b3b;
 $dark-gray3: #484848;
 $dark-gray2: #545454;
@@ -35,5 +34,4 @@ $light-gray1: #e9e9e9;
 
 //@import "~@blueprintjs/core/scripts/sass-custom-functions.js"
 
-
-@import "~@blueprintjs/core/src/blueprint"
+@import '~@blueprintjs/core/src/blueprint';
