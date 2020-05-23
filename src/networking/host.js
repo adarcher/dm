@@ -9,47 +9,47 @@ const SendGameState = state => {
   Networking.Send({ game: state });
 };
 
+const HostDataIn = (data, connection) => {
+  if (data == 'connected') {
+    console.log(`Send first state: ${connection.peer}`);
+    connection.Send({ game: GameRoom.previous_state });
+  }
+
+  if (data.player) {
+    let player = GameRoom.players.find(p => p.name == data.player.name);
+    if (!player) {
+      player = new Player();
+      GameRoom.players.push(player);
+    }
+    player.Load(data.player);
+    player.conn = connection;
+
+    const token = GameRoom.tokens.find(t => t.name == player.name);
+    if (token) {
+      token.Load(data.player);
+    }
+  }
+
+  if (data.ping) {
+    // Send off ping
+    AddPing(data.ping);
+    Networking.Send({ ping: data.ping }, [connection]);
+  }
+};
+
 const SetupHost = id => {
   console.log(`Host Room(${id})`);
 
-  GameRoom.LoadFromDisk();
   GameRoom.dm = true;
+  GameRoom.LoadFromDisk();
 
-  RenderInfo.widgets.push(GridSizer);
-
-  Networking.customDataIn = (data, connection) => {
-    if (data == 'connected') {
-      console.log(`Send first state: ${connection.peer}`);
-      connection.Send({ game: GameRoom.previous_state });
-    }
-
-    if (data.player) {
-      let player = GameRoom.players.find(p => p.name == data.player.name);
-      if (!player) {
-        player = new Player();
-        GameRoom.players.push(player);
-      }
-      player.Load(data.player);
-      player.conn = connection;
-
-      const token = GameRoom.tokens.find(t => t.name == player.name);
-      if (token) {
-        token.Load(data.player);
-      }
-    }
-
-    if (data.ping) {
-      // Send off ping
-      AddPing(data.ping);
-      Networking.Send({ ping: data.ping }); //, [connection]);
-    }
-  };
-
-  Networking.OpenRoom(id);
-
-  // GameRoom.LoadFromDisk();
+  // Host render differences
   RenderInfo.CenterOnGrid(GameRoom.board.focus);
   RenderInfo.fog_color = 'rgba(0,0,0,.75)';
+  RenderInfo.widgets.push(GridSizer);
+
+  Networking.customDataIn = HostDataIn;
+  Networking.OpenRoom(id);
 
   GameRoom.SubscribeToStateChange('host', SendGameState);
 };
