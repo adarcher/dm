@@ -36,25 +36,26 @@ const CheckPlayerState = () => {
   previous_player_state = current_player_state;
 };
 
+const JoinDataIn = () => {
+  if (data.game != undefined) {
+    const game = data.game;
+    GameRoom.Load(game);
+    GameRoom.Focus();
+  }
+
+  if (data.ping) {
+    AddPing(data.ping);
+  }
+};
+
 const SetupJoin = (name, id) => {
   console.log(`Join Room(${id})`);
+  // Hack to clear screen
   GameRoom.DeleteBoard(0);
 
   Player.LoadPlayer(name);
 
-  Networking.customDataIn = (data, connection) => {
-    if (data.game != undefined) {
-      const game = data.game;
-      GameRoom.Load(game);
-      if (game.boards[game.board_id].focus != undefined) {
-        RenderInfo.CenterOnGrid(GameRoom.board.focus);
-      }
-    }
-
-    if (data.ping) {
-      AddPing(data.ping);
-    }
-  };
+  Networking.customDataIn = JoinDataIn;
 
   Networking.JoinRoom(id);
 

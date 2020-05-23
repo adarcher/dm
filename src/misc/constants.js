@@ -24,6 +24,7 @@ export const GROUND_EFFECTS = Enum([
 ]);
 
 export const LS_PREFIX = 'backup_';
+export const LS_BACKUP_COUNT = 'dm_backup_count';
 
 export const SVG_DUMMY = document.createElementNS(
   'http://www.w3.org/2000/svg',

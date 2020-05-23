@@ -21,7 +21,7 @@ class RenderInfoSingleton {
   Resize = () => {
     this.center_arm = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     this.UpdateOffsetFromCenter(this.center);
-    this.dirty = true;
+    if (Renderer) Renderer.dirty = true;
   };
   // End constuctor stage
 

@@ -3,7 +3,7 @@ import { RenderInfo } from './render_info';
 import Board from './renderables/game_objects/board';
 import Player from './renderables/game_objects/player';
 import { LoadIntoArray, Diff, Combine } from './renderables/misc/common';
-import { LS_PREFIX, MAX_STATES } from './misc/constants';
+import { LS_PREFIX, MAX_STATES, LS_BACKUP_COUNT } from './misc/constants';
 import { Renderer } from './renderer';
 import { Networking, NetworkLatency } from './networking/websocket';
 import Layer from './renderables/game_objects/layer';
@@ -23,9 +23,6 @@ class GameRoomSingleton {
   @observable boards = [new Board()];
   @observable board_id = 0;
 
-  @observable player_tokens = [];
-
-  effect = [];
   @observable players = [new Player()];
 
   get player() {
@@ -43,16 +40,12 @@ class GameRoomSingleton {
     if (raw.board_id != undefined) {
       this.board_id = raw.board_id;
     }
-    if (raw.effects) {
-      // Effect.LaodIntoArray(this.effect, raw.effects);
-    }
     if (raw.id != undefined) {
       this.id = raw.id;
     }
     if (raw.hidden != undefined) {
       this.hidden = raw.hidden;
     }
-    // Players;
   }
 
   Save() {
@@ -60,88 +53,74 @@ class GameRoomSingleton {
       boards: this.boards.map(b => b.Save()),
       board_id: this.board_id,
       hidden: this.hidden,
-      // effects:
-      // players:
     };
   }
 
   SaveToDisk() {
-    let backup_count =
-      Math.max(
-        0,
-        ...Object.keys(localStorage)
-          .filter(k => k.substring(0, LS_PREFIX.length) == LS_PREFIX)
-          .map(k => 1 + parseInt(k.substring(LS_PREFIX.length)))
-      ) % 10;
-    localStorage[`${LS_PREFIX}${backup_count}`] = localStorage.gameroom;
-    var current = this.Save();
-    localStorage.gameroom = JSON.stringify(current);
+    if (localStorage.gameroom) {
+      const current_backup = localStorage[LS_BACKUP_COUNT] || 0;
+      const next_backup = (current_backup + 1) % 10;
+      localStorage[`${LS_PREFIX}${next_backup}`] = localStorage.gameroom;
+    }
+    localStorage.gameroom = JSON.stringify(this.Save());
   }
 
   LoadFromDisk() {
-    const raw = localStorage.gameroom;
-    if (raw) {
-      this.Load(JSON.parse(raw));
-    } else {
-      // Load default?
+    try {
+      this.Load(JSON.parse(localStorage.gameroom));
+      this.SaveToDisk();
+    } catch {
+      console.log('LoadFromDisk(): No save data available');
     }
-
-    // Resave in case we are version updating or whatever
-    this.SaveToDisk();
-  }
-
-  CurrentView() {
-    return {
-      boards: [this.boards[this.board_id].Save()],
-      board_id: 0,
-      // effects:
-      // players:
-    };
   }
 
   get board() {
-    var board = this.boards[this.board_id];
-    if (board) {
-      return board;
+    if (this.boards.length > this.board_id) {
+      return this.boards[this.board_id];
+    } else {
+      return false;
     }
-    return false;
   }
 
   get distance_step() {
-    var board = this.board;
+    const board = this.board;
     return board ? board.distance_step : 5;
   }
 
   get layer() {
-    var board = this.board;
-    if (board) {
+    const board = this.board;
+    if (board && board.layers.length > board.layer_id) {
       return board.layers[board.layer_id];
+    } else {
+      return false;
     }
-    return false;
   }
 
   get tokens() {
-    var layer = this.layer;
+    const layer = this.layer;
     if (layer) {
       return layer.tokens;
+    } else {
+      return [];
     }
-    return [];
   }
 
   get fog() {
-    var layer = this.layer;
+    const layer = this.layer;
     if (layer) {
       return layer.fog;
+    } else {
+      return false;
     }
-    return false;
   }
 
   get ground_effects() {
-    var layer = this.layer;
+    const layer = this.layer;
     if (layer) {
       return layer.effects;
+    } else {
+      return false;
     }
-    return false;
   }
 
   // Margin is in %
@@ -311,6 +290,13 @@ class GameRoomSingleton {
   @observable latency = 0;
   @observable latency_window = NetworkLatency.window;
   @observable latency_size = 0;
+
+  Focus = () => {
+    const board = this.board;
+    if (board) {
+      RenderInfo.CenterOnGrid(board.focus);
+    }
+  };
 }
 
 export const GameRoom = new GameRoomSingleton();
