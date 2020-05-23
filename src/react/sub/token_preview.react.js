@@ -21,6 +21,4 @@ const TokenPreview = props => {
   return <canvas className='token-image-preview' ref={t_ref} />;
 };
 
-// TokenPreview.displayName = 'TokenPreview';
-
 export default observer(TokenPreview);

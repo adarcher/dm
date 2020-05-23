@@ -8,20 +8,30 @@ import { Networking } from './websocket';
 import { RenderInfo } from '../render_info';
 
 let previous_player_state = false;
+let last_send = 0;
 const CheckPlayerState = () => {
+  const now = Date.now();
   const current_player_state = Player.SavePlayer();
   const token = GameRoom.tokens.find(t => t.name == current_player_state.name);
   if (token) {
     token.Load(current_player_state);
     Object.assign(current_player_state, token.Save());
   }
+  let update = false;
+  const delta_time = now - last_send;
+  if (delta_time > 1000) {
+    last_send = now;
+    update = true;
+  }
   if (previous_player_state) {
     const diff = Diff(previous_player_state, current_player_state, false);
     if (diff) {
       Renderer.dirty = true;
-      // Check if we've got token data to send
-      Networking.Send({ player: current_player_state });
+      update = true;
     }
+  }
+  if (update) {
+    Networking.Send({ player: current_player_state });
   }
   previous_player_state = current_player_state;
 };

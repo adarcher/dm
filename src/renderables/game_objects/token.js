@@ -97,6 +97,12 @@ export default class Token extends TokenBase {
       if (raw.size != undefined) {
         this.size = raw.size;
       }
+      if (raw.initiative != undefined) {
+        this.initiative = raw.initiative;
+      }
+      if (raw.current_roll != undefined) {
+        this.current_roll = raw.current_roll;
+      }
     }
 
     return this;
@@ -109,6 +115,8 @@ export default class Token extends TokenBase {
       x: this.x,
       y: this.y,
       size: this.size,
+      initiative: this.initiative,
+      current_roll: this.current_roll.slice(),
     });
     return raw;
   }
@@ -281,5 +289,16 @@ export default class Token extends TokenBase {
   // UI
   UIState = () => {
     return this.over;
+  };
+
+  // GamePlay
+  @observable initiative = 0;
+  @observable current_roll = [0, 0, 0];
+
+  RollInitiative = () => {
+    const roll = Math.floor(1 + Math.random() * 20);
+    const result = roll + this.initiative;
+    this.current_roll = [result, roll, this.initiative];
+    return this.current_roll;
   };
 }

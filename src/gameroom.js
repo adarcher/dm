@@ -205,6 +205,17 @@ class GameRoomSingleton {
     }
   };
 
+  RenderState() {
+    const state = {
+      board_id: 0,
+      boards: this.board ? [this.board.Save()] : [],
+      hidden: this.hidden,
+      grid: RenderInfo.grid_on,
+    };
+
+    return state;
+  }
+
   current_state_id = 0;
   states = [];
   previous_state = false;
@@ -213,7 +224,7 @@ class GameRoomSingleton {
     this.CheckStates();
 
     let changed = true;
-    let current_state = this.Save();
+    let current_state = this.RenderState();
     if (this.previous_state) {
       const diff = Diff(this.previous_state, current_state);
       if (diff) {

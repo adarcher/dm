@@ -5,6 +5,7 @@ import {
   Callout,
   Collapse,
   Intent,
+  Tag,
 } from '@blueprintjs/core';
 import { observer } from 'mobx-react';
 import { useMemo } from 'react';
@@ -37,6 +38,11 @@ const TokenInfo = props => {
   const style = useMemo(() => ({
     backgroundImage: `${gradient}`,
   }));
+
+  const result = useMemo(() => token.current_roll[0]);
+  const roll = useMemo(() => token.current_roll[1]);
+  const add = useMemo(() => token.current_roll[2]);
+  const roll_string = useMemo(() => `${result} = ${roll}(d20) + ${add}`);
 
   return (
     <Callout
@@ -76,6 +82,15 @@ const TokenInfo = props => {
           </ButtonGroup>
           <ButtonGroup>
             <SButton title='delete' onClick={token.Remove} icon='delete' />
+            {result > 0 ? (
+              <Tag title={roll_string}>{result}</Tag>
+            ) : (
+              <SButton
+                title='roll'
+                onClick={token.RollInitiative}
+                icon='random'
+              />
+            )}
           </ButtonGroup>
         </div>
         <Collapse isOpen={open} className='layer-info'>

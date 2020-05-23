@@ -5,6 +5,7 @@ import {
   Callout,
   Collapse,
   Intent,
+  Tag,
 } from '@blueprintjs/core';
 import { observer } from 'mobx-react';
 import { GameRoom } from '../../../gameroom';
@@ -47,6 +48,11 @@ const PlayerTokenInfo = props => {
     return s;
   });
 
+  const result = useMemo(() => (token ? token.current_roll[0] : 0));
+  const roll = useMemo(() => (token ? token.current_roll[1] : 0));
+  const add = useMemo(() => (token ? token.current_roll[2] : 0));
+  const roll_string = useMemo(() => `${result} = ${roll}(d20) + ${add}`);
+
   return (
     <Callout icon={null} className='token-callout' style={style}>
       <input
@@ -77,8 +83,13 @@ const PlayerTokenInfo = props => {
               icon='locate'
               disabled={!token}
             />
+            <SButton
+              title='Roll Initiative'
+              onClick={token ? token.RollInitiative : () => {}}
+              icon='random'
+            />
           </ButtonGroup>
-          <ButtonGroup>{props.children}</ButtonGroup>
+          <Tag title={roll_string}>{result}</Tag>
         </div>
         <Collapse isOpen={open} className='layer-info'>
           <FormGroup inline={false} label='Image URL'>

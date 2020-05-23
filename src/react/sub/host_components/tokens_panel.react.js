@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Drawer,
   Position,
@@ -34,6 +34,18 @@ const Tokens = props => {
     }
   };
 
+  const tokens = useMemo(() => [...allTokens()]);
+  const combat = useMemo(() => {
+    const combat_tokens = tokens.filter(t => t.current_roll[1] != 0);
+    combat_tokens.sort((a, b) => b.current_roll[0] - a.current_roll[0]);
+    return combat_tokens;
+  });
+  const other = tokens.filter(t => t.current_roll[1] == 0);
+
+  const ResetCombat = () => {
+    tokens.forEach(t => (t.current_roll = [0, 0, 0]));
+  };
+
   return (
     <>
       <FormGroup vertial={true}>
@@ -41,10 +53,15 @@ const Tokens = props => {
           <Popover>
             <SButton text={sphere} rightIcon='caret-down' />
           </Popover>
+          <SButton icon='reset' onClick={ResetCombat} />
           <SButton icon='new-person' onClick={add} />
         </div>
         <Divider />
-        {allTokens().map(token => (
+        {combat.map(token => (
+          <TokenInfo key={token.key} token={token} />
+        ))}
+        <Divider />
+        {other.map(token => (
           <TokenInfo key={token.key} token={token} />
         ))}
       </FormGroup>

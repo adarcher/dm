@@ -32,8 +32,8 @@ const TabIcon = toolset => {
 
 const DMHeader = props => {
   const screen = props.screen;
-  const network_id = screen.user_id;
   const mode = useMemo(() => screen.mode);
+  const network_id = mode == 'Host' ? screen.user_id : screen.join_id;
 
   const toolset = useMemo(() => screen.toolset);
 

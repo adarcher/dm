@@ -8,15 +8,25 @@ const Players = props => {
   return (
     <>
       {GameRoom.players.map(p => (
-        <React.Fragment key={p.name}>
-          <SButton key={p.name} onClick={p.AddToLayer} disabled={p.token}>
-            {p.name}
-          </SButton>
-          <br />
-        </React.Fragment>
+        <PlayerInfo player={p} />
       ))}
     </>
   );
 };
+
+const PlayerInfo = observer(props => {
+  const player = props.player;
+  return (
+    <div key={player.name} className='player-info'>
+      <SButton
+        key={player.name}
+        onClick={player.AddToLayer}
+        disabled={player.token}
+      >
+        {player.name}
+      </SButton>
+    </div>
+  );
+});
 
 export default observer(Players);
