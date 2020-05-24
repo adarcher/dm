@@ -47,6 +47,8 @@ class RenderInfoSingleton {
   // When comparing to a background image: center/96 * img.ppi
   @observable center = { x: 0, y: 0 };
   @observable center_arm = { x: 0, y: 0 };
+  width = 0;
+  height = 0;
   // Mouse location
   @observable mouse = { x: 0, y: 0 };
   mouse_zoom = { x: 0, y: 0 };
@@ -114,12 +116,16 @@ class RenderInfoSingleton {
 
       this.center_arm.x = mouse.cx;
       this.center_arm.y = mouse.cy;
+      this.width = 2 * this.center_arm.x;
+      this.height = 2 * this.center_arm.y;
 
       this.center = {
         x: Math.round(this.UnZoom(mouse.cx - this.offset.x)),
         y: Math.round(this.UnZoom(mouse.cy - this.offset.y)),
       };
     }
+    this.width = 2 * this.center_arm.x;
+    this.height = 2 * this.center_arm.y;
 
     // First check Zoom
     if (zoom != undefined) {

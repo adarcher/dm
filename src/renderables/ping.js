@@ -14,8 +14,10 @@ export const DrawPing = (context, p) => {
 
     const size = (0.1 + (1 - t) * 0.9) * PPI;
 
+    const center_x = Math.min(Math.max(0, left), RenderInfo.width);
+    const center_y = Math.min(Math.max(0, top), RenderInfo.height);
     context.beginPath();
-    context.arc(left, top, size / 2, 0, 6.28, false);
+    context.arc(center_x, center_y, size / 2, 0, 6.28, false);
     context.closePath();
 
     let fill_color = Color(color).fade(1 - t);
