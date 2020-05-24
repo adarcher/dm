@@ -8,7 +8,7 @@ const Players = props => {
   return (
     <>
       {GameRoom.players.map(p => (
-        <PlayerInfo player={p} />
+        <PlayerInfo key={p.name} player={p} />
       ))}
     </>
   );

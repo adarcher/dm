@@ -15,7 +15,9 @@ const CheckPlayerState = () => {
   const token = GameRoom.tokens.find(t => t.name == current_player_state.name);
   if (token) {
     token.Load(current_player_state);
+    // if (token.lock) {
     Object.assign(current_player_state, token.Save());
+    // }
   }
   let update = false;
   const delta_time = now - last_send;
@@ -36,10 +38,10 @@ const CheckPlayerState = () => {
   previous_player_state = current_player_state;
 };
 
-const JoinDataIn = () => {
+const JoinDataIn = (data, connection) => {
   if (data.game != undefined) {
     const game = data.game;
-    GameRoom.Load(game);
+    GameRoom.LoadRenderState(game);
     GameRoom.Focus();
   }
 

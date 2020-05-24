@@ -195,6 +195,13 @@ class GameRoomSingleton {
     return state;
   }
 
+  LoadRenderState(state) {
+    this.Load(state);
+    if (state.grid != undefined) {
+      RenderInfo.grid_on = state.grid;
+    }
+  }
+
   current_state_id = 0;
   states = [];
   previous_state = false;
