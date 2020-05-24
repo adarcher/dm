@@ -214,11 +214,13 @@ export default class Token extends TokenBase {
   pickup_location = false;
   Pickup(coord) {
     this.pickup_location = { x: this.x, y: this.y };
+    clearTimeout(this.unlock_timeout);
     this.Lock();
   }
+  unlock_timeout;
   Drop() {
     this.pickup_location = false;
-    setTimeout(() => this.Unlock(), 2000);
+    this.unlock_timeout = setTimeout(() => this.Unlock(), 2000);
     // this.Unlock();
   }
 

@@ -12,10 +12,12 @@ export default function Grabbable(clazz) {
   });
 
   clazz.prototype.Lock = function () {
+    console.log('lock');
     this.lock = true;
   };
 
   clazz.prototype.Unlock = function () {
+    console.log('unlock');
     this.lock = false;
   };
 

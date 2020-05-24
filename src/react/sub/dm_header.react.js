@@ -8,6 +8,7 @@ import {
   Alignment,
   Icon,
   NavbarDivider,
+  ButtonGroup,
 } from '@blueprintjs/core';
 import { TOOLSET, TOOLSET_ICON } from '../../misc/constants';
 import SButton from '../components/small_button.react';
@@ -88,7 +89,12 @@ const DMHeader = props => {
       case 'Join':
         return [<HostLink key='link' id={network_id} />];
     }
-    return [];
+    return (
+      <ButtonGroup>
+        <SButton text={BRANCH} />
+        <SButton text={VERSION} />
+      </ButtonGroup>
+    );
   };
 
   const Right = () => <ZoomControls />;

@@ -53,6 +53,7 @@ class GameRoomSingleton {
       boards: this.boards.map(b => b.Save()),
       board_id: this.board_id,
       hidden: this.hidden,
+      grid: RenderInfo.grid_on,
     };
   }
 
