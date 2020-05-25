@@ -52,7 +52,6 @@ export class Screen extends React.Component {
   set mode(val) {
     // Add Shutdown here if needed
     this._mode = val;
-    console.log(`Switch mode: ${this._mode}`);
     switch (this._mode) {
       case 'Host':
         Host.Setup(this.user_id);

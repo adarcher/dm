@@ -5,14 +5,13 @@ import { Renderer } from '../../renderer';
 import { MiniMapInfo, RenderInfo } from '../../render_info';
 import { GameRoom } from '../../gameroom';
 import { Grid } from '../../misc/grid';
-import { DrawPing } from '../../renderables/ping';
+import Ping, { DrawPing } from '../../renderables/misc/ping';
 
 const MiniMap = props => {
   const canvas = useRef();
   const dirty = useMemo(() => Renderer.dirty);
 
   useEffect(() => {
-    console.log('draw minimap');
     if (canvas.current) {
       const board = GameRoom.board;
       if (board) {
@@ -29,9 +28,7 @@ const MiniMap = props => {
         MiniMapInfo.UpdateCenterFromOffset(mouse);
         board.Draw(context, MiniMapInfo);
 
-        RenderInfo.pings.forEach(p => {
-          DrawPing(context, p, MiniMapInfo);
-        });
+        Ping.DrawAll(context, MiniMapInfo);
       }
     }
   }, [Renderer.dirty]);

@@ -1,9 +1,9 @@
 import { Networking } from './websocket';
 import { GameRoom } from '../gameroom';
 import Player from '../renderables/game_objects/player';
-import { AddPing } from '../renderables/ping';
 import { RenderInfo } from '../render_info';
 import { GridSizer } from '../renderables/widgets/grid_sizer';
+import Ping from '../renderables/misc/ping';
 
 const SendGameState = state => {
   Networking.Send({ game: state });
@@ -32,7 +32,7 @@ const HostDataIn = (data, connection) => {
 
   if (data.ping) {
     // Send off ping
-    AddPing(data.ping);
+    Ping.Add(data.ping);
     Networking.Send({ ping: data.ping }, [connection]);
   }
 };

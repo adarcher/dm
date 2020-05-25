@@ -1,11 +1,11 @@
 import { Diff } from '../renderables/misc/common';
 import { Renderer } from '../renderer';
 import { Brush, BrushStyle } from '../renderables/brush';
-import { AddPing } from '../renderables/ping';
 import { GameRoom } from '../gameroom';
 import Player from '../renderables/game_objects/player';
 import { Networking } from './websocket';
 import { RenderInfo } from '../render_info';
+import Ping from '../renderables/misc/ping';
 
 let previous_player_state = false;
 let last_send = 0;
@@ -46,7 +46,7 @@ const JoinDataIn = (data, connection) => {
   }
 
   if (data.ping) {
-    AddPing(data.ping);
+    Ping.Add(data.ping);
   }
 };
 

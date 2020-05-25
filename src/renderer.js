@@ -1,7 +1,7 @@
 import { Grid } from './misc/grid.js';
 import { GameRoom } from './gameroom';
 import { GRID_WIDTH } from './misc/constants.js';
-import { DrawPing } from './renderables/ping.js';
+import Ping, { DrawPing } from './renderables/misc/ping.js';
 import { observable } from 'mobx';
 
 const GetContext = canvas => {
@@ -9,6 +9,39 @@ const GetContext = canvas => {
   context.canvas.width = canvas.clientWidth;
   context.canvas.height = canvas.clientHeight;
   return context;
+};
+
+const RenderText = (context, string, size) => {
+  context.font = `bold ${size}px serif`;
+  context.textBaseline = 'middle';
+  context.textAlign = 'center';
+  context.fillText(
+    string,
+    context.canvas.width / 2,
+    context.canvas.height * 0.55
+  );
+};
+
+const DMGate = context => {
+  if (!GameRoom.dm && GameRoom.hidden) {
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    context.fillStyle = 'white';
+    RenderText(context, 'DM is working on something...', 32);
+    return false;
+  }
+  return true;
+};
+
+const GameGate = context => {
+  if (!GameRoom.board) {
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    context.fillStyle = 'white';
+    RenderText(context, 'No Current Game, Please Wait...', 32);
+    return false;
+  }
+  return true;
 };
 
 class RendererSingleton {
@@ -20,6 +53,9 @@ class RendererSingleton {
   Render = (canvas, render_context) => {
     GameRoom.CheckState();
     if (!this.dirty || !canvas) return;
+    this.dirty = false;
+    const context = canvas.getContext('2d');
+
     this.frames++;
     const now = Date.now();
     const delta = (now - this.frame_time) / 1000;
@@ -28,34 +64,12 @@ class RendererSingleton {
       this.frames = 0;
       this.frame_time = now;
     }
-    this.dirty = false;
-    if (!GameRoom.dm && GameRoom.hidden) {
-      const context = canvas.getContext('2d');
-      context.fillStyle = 'black';
-      context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-      context.font = `bold 32px serif`;
-      context.fillStyle = 'white';
-      context.textBaseline = 'middle';
-      context.textAlign = 'center';
-      context.fillText(
-        'DM is working on something...',
-        context.canvas.width / 2,
-        context.canvas.height * 0.55
-      );
+
+    if (!DMGate(context) || !GameGate(context)) {
       return;
     }
 
-    var board = GameRoom.board;
-    if (!board) {
-      const context = canvas.getContext('2d');
-      context.fillStyle = 'black';
-      context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-      return;
-    }
-
-    const context = GetContext(canvas);
-
-    board.Draw(context, render_context);
+    GameRoom.board.Draw(context, render_context);
 
     if (render_context.grid_on) {
       const start = render_context.grid_start;
@@ -70,9 +84,7 @@ class RendererSingleton {
 
     GameRoom.tokens.forEach(token => token.DrawOver(context, render_context));
 
-    render_context.pings.forEach(p => {
-      DrawPing(context, p, render_context);
-    });
+    Ping.DrawAll(context, render_context);
   };
 }
 

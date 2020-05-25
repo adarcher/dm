@@ -1,8 +1,8 @@
 import { GameRoom } from './gameroom';
 import { RenderInfo } from './render_info';
 import { Brush } from './renderables/brush';
-import { AddPing } from './renderables/ping';
 import { Networking } from './networking/websocket';
+import Ping from './renderables/misc/ping';
 
 export const EnableInput = dom => {
   console.log(`Enabling input listeners on: ${dom}`);
@@ -92,7 +92,7 @@ export const EnableInput = dom => {
           y: RenderInfo.location.y,
           color: GameRoom.player.color,
         };
-        AddPing(ping);
+        Ping.Add(ping);
         Networking.Send({ ping: ping });
       }
 

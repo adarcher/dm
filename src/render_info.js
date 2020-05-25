@@ -6,6 +6,7 @@ import Blur from './renderables/blur.js';
 import { GameRoom } from './gameroom';
 import { Diff } from './renderables/misc/common.js';
 import { Renderer } from './renderer.js';
+import Ping from './renderables/misc/ping.js';
 
 class RenderContext {
   // export default class RenderInfo {
@@ -68,9 +69,6 @@ class RenderContext {
   // Held Widgets
   @observable widgets = [];
   @observable held = [];
-
-  // Pings
-  @observable pings = [];
 
   // Animation variables
   animation_start_time = 0;
@@ -331,12 +329,11 @@ class RenderContext {
 
   previous_ui_state = false;
   CheckState = () => {
-    const now = Date.now();
-    if (this.pings.length > 0) {
-      this.pings = this.pings.filter(p => p.end > now);
+    if (Ping.ping_cache.length > 0) {
       Renderer.dirty = true;
     }
     const current_ui_state = this.UIState();
+    current_ui_state.pings = Ping.ping_cache.length;
     if (this.previous_ui_state) {
       const diff = Diff(this.previous_ui_state, current_ui_state, false);
       if (diff) {
@@ -346,7 +343,20 @@ class RenderContext {
 
     this.previous_ui_state = current_ui_state;
   };
+
+  ping_min = 0.1;
+  ping_max = 0.9;
+  ping_size = PPI;
+  PingSize = t => {
+    if (this.ping_min != this.ping_max) {
+      return (this.ping_min + (1 - t) * this.ping_max) * this.ping_size;
+    } else {
+      return this.ping_size;
+    }
+  };
 }
 
 export const RenderInfo = new RenderContext();
 export const MiniMapInfo = new RenderContext();
+MiniMapInfo.ping_size = 5;
+MiniMapInfo.ping_min = MiniMapInfo.ping_max;
