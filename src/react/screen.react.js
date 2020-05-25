@@ -12,6 +12,7 @@ import { EnableInput } from '../inputs';
 import DMInfo from './sub/dm_info.react';
 import Host from '../networking/host';
 import Join from '../networking/join';
+import { RenderInfo } from '../render_info';
 
 const Modes = Enum(['Welcome', 'Host', 'View', 'Player']);
 
@@ -20,15 +21,12 @@ export class Screen extends React.Component {
   constructor(props) {
     super(props);
 
-    // GameRoom.LoadFromDisk();
-
     this.user_id = Networking.GenerateRoomId();
     window.requestAnimationFrame(this.Draw);
 
     if (props.join) {
       console.log(`JOIN: ${props.join}`);
       this.join_id = props.join;
-      // this.mode = Modes.Join;
     }
   }
 
@@ -41,7 +39,7 @@ export class Screen extends React.Component {
   @observable input_ref = React.createRef();
 
   Draw = () => {
-    Renderer.Render(this.canvas_ref.current);
+    Renderer.Render(this.canvas_ref.current, RenderInfo);
     window.requestAnimationFrame(this.Draw);
   };
 

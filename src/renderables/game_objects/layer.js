@@ -67,35 +67,37 @@ export default class Layer {
     return layer;
   }
 
-  Draw = context => {
+  Draw = (context, render_context) => {
     if (!this.visible) {
       return;
     }
 
     const width = context.canvas.width;
     const height = context.canvas.height;
+    // const transform = context.getTransform();
 
     // Resize context
     const layer_context = this.canvas.getContext('2d');
     layer_context.canvas.width = width;
     layer_context.canvas.height = height;
+    // layer_context.setTransform(transform);
 
     if (GameRoom.dm && this.use_dm) {
       this.background.ready;
-      this.background_dm.Draw(layer_context);
+      this.background_dm.Draw(layer_context, render_context);
     } else {
-      this.background.Draw(layer_context);
+      this.background.Draw(layer_context, render_context);
     }
 
     // layer tokens
-    this.tokens.forEach(t => t.Draw(layer_context));
+    this.tokens.forEach(t => t.Draw(layer_context, render_context));
 
-    this.effects.Draw(layer_context);
-    this.fog.Draw(layer_context);
+    this.effects.Draw(layer_context, render_context);
+    this.fog.Draw(layer_context, render_context);
 
     // Add in grid_offset here
     // Complicated since tokens are drawn in layer-space... TBD
-    context.drawImage(layer_context.canvas, 0, 0);
+    context.drawImage(layer_context.canvas, 0, 0); //, -transform.e, -transform.f);
   };
 
   get index() {

@@ -121,10 +121,10 @@ export default class Token extends TokenBase {
     return raw;
   }
 
-  Path(context, line_width) {
-    const delta = RenderInfo.grid_delta;
-    const x_offset = RenderInfo.offset.x;
-    const y_offset = RenderInfo.offset.y;
+  Path(context, line_width, render_context) {
+    const delta = render_context.grid_delta;
+    const x_offset = render_context.offset.x;
+    const y_offset = render_context.offset.y;
     const x = Math.round(this.x * delta + x_offset);
     const y = Math.round(this.y * delta + y_offset);
     const size = Math.ceil(this.size * delta);
@@ -134,7 +134,7 @@ export default class Token extends TokenBase {
     context.arc(
       x + radius,
       y + radius,
-      radius - (RenderInfo.zoom * (line_width + GRID_WIDTH)) / 2,
+      radius - (render_context.zoom * (line_width + GRID_WIDTH)) / 2,
       0,
       6.28,
       false
@@ -142,13 +142,13 @@ export default class Token extends TokenBase {
     context.closePath();
   }
 
-  Draw(context) {
+  Draw(context, render_context) {
     if (!GameRoom.dm && !this.visible) {
       return;
     }
-    this.DrawPlayer(context);
+    this.DrawPlayer(context, render_context);
     context.save();
-    this.Path(context, TOKEN_BORDER_WIDTH);
+    this.Path(context, TOKEN_BORDER_WIDTH, render_context);
 
     // Fill Color
     context.strokeStyle = this.color;
@@ -156,9 +156,9 @@ export default class Token extends TokenBase {
     context.globalAlpha = this.visible ? 1 : 0.5;
     context.fill();
 
-    const delta = RenderInfo.grid_delta;
-    const x_offset = RenderInfo.offset.x;
-    const y_offset = RenderInfo.offset.y;
+    const delta = render_context.grid_delta;
+    const x_offset = render_context.offset.x;
+    const y_offset = render_context.offset.y;
     const x = Math.round(this.x * delta + x_offset);
     const y = Math.round(this.y * delta + y_offset);
     const size = Math.ceil(this.size * delta);
@@ -183,9 +183,9 @@ export default class Token extends TokenBase {
     context.fill();
 
     // Border
-    context.lineWidth = RenderInfo.zoom * 5;
+    context.lineWidth = render_context.zoom * 5;
     context.shadowColor = 'black';
-    context.shadowBlur = 10 * RenderInfo.zoom;
+    context.shadowBlur = 10 * render_context.zoom;
     context.stroke();
 
     context.restore();
@@ -229,27 +229,27 @@ export default class Token extends TokenBase {
     this.y = RenderInfo.current_grid.y - this.held_offset.y;
   }
 
-  DrawOver(context) {
+  DrawOver(context, render_context) {
     if (!GameRoom.dm && !this.visible) {
       return;
     }
     if (this.over) {
       context.strokeStyle = this.color;
-      this.Path(context, 0);
+      this.Path(context, 0, render_context);
       context.globalAlpha = 1;
-      context.lineWidth = 10 * RenderInfo.zoom;
+      context.lineWidth = 10 * render_context.zoom;
       context.stroke();
     }
   }
 
-  DrawPlayer(context) {
+  DrawPlayer(context, render_context) {
     if (!GameRoom.dm && !this.visible) {
       return;
     }
     if (this.over) {
       const player = GameRoom.player;
       if (player.name == this.name) {
-        player.Draw(context, this.pickup_location);
+        player.Draw(context, render_context, this.pickup_location);
       }
     }
   }

@@ -7,7 +7,7 @@ import { GameRoom } from '../../gameroom';
 import PlayerTokenInfo from './join_components/player_token_info.react';
 import Edit from './host_components/edit.react';
 import Players from './host_components/players.react';
-import LayerInfo from './host_components/layer_info.react';
+import MiniMap from './minimap.react';
 import Tokens from './host_components/tokens_panel.react';
 
 const DMToolsLeft = props => {
@@ -24,6 +24,8 @@ const DMToolsLeft = props => {
         return <Players {...props} />;
       case TOOLSET.Mobs:
         return <Tokens {...props} />;
+      case TOOLSET.Combat:
+        return <MiniMap />;
     }
     return <></>;
   };

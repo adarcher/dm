@@ -1,6 +1,5 @@
 import { observable } from 'mobx';
 import Token, { TokenBase } from './token';
-import { RenderInfo } from '../../render_info';
 import { TOKEN_BORDER_WIDTH } from '../../misc/constants';
 import { GameRoom } from '../../gameroom';
 
@@ -51,20 +50,20 @@ export default class Player extends TokenBase {
     return raw;
   }
 
-  Draw(context, optional_location = false) {
+  Draw(context, render_context, optional_location = false) {
     const token = this.token;
     if (token) {
       context.save();
-      context.lineWidth = RenderInfo.zoom * TOKEN_BORDER_WIDTH;
+      context.lineWidth = render_context.zoom * TOKEN_BORDER_WIDTH;
       const rx = optional_location ? optional_location.x : token.x;
       const ry = optional_location ? optional_location.y : token.y;
 
       const val = this.run;
-      const delta = RenderInfo.grid_delta;
+      const delta = render_context.grid_delta;
       const radius = Math.floor(val / 5);
       const size = (2 * radius + 1) * delta;
-      const x_offset = RenderInfo.offset.x;
-      const y_offset = RenderInfo.offset.y;
+      const x_offset = render_context.offset.x;
+      const y_offset = render_context.offset.y;
       const x = Math.round((rx - radius) * delta + x_offset);
       const y = Math.round((ry - radius) * delta + y_offset);
 
@@ -72,41 +71,6 @@ export default class Player extends TokenBase {
       context.fillStyle = `${Player.movement_colors.run}44`;
       context.fillRect(x, y, size, size);
       context.strokeRect(x, y, size, size);
-
-      // Object.keys(this.show_vision)
-      //   .filter(f => this.show_vision[f])
-      //   .forEach(i => {
-      //     const val = this.vision[i];
-      //     const delta = RenderInfo.grid_delta;
-      //     const radius = Math.floor(val / 5);
-      //     const size = (2 * radius + 1) * delta;
-      //     const x_offset = RenderInfo.offset.x;
-      //     const y_offset = RenderInfo.offset.y;
-      //     const x = Math.round((token.x - radius) * delta + x_offset);
-      //     const y = Math.round((token.y - radius) * delta + y_offset);
-
-      //     context.strokeStyle = Player.vision_colors[i];
-      //     context.fillStyle = `${Player.vision_colors[i]}44`;
-      //     context.fillRect(x, y, size, size);
-      //     context.strokeRect(x, y, size, size);
-      //   });
-      // Object.keys(this.show_range)
-      //   .filter(f => this.show_range[f])
-      //   .forEach(i => {
-      //     const val = this[i];
-      //     const delta = RenderInfo.grid_delta;
-      //     const radius = Math.floor(val / 5);
-      //     const size = (2 * radius + 1) * delta;
-      //     const x_offset = RenderInfo.offset.x;
-      //     const y_offset = RenderInfo.offset.y;
-      //     const x = Math.round((token.x - radius) * delta + x_offset);
-      //     const y = Math.round((token.y - radius) * delta + y_offset);
-
-      //     context.strokeStyle = Player.movement_colors[i];
-      //     context.fillStyle = `${Player.movement_colors[i]}44`;
-      //     context.fillRect(x, y, size, size);
-      //     context.strokeRect(x, y, size, size);
-      //   });
       context.restore();
     }
   }

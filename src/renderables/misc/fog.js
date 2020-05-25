@@ -1,7 +1,6 @@
 import { action, observable } from 'mobx';
 import Node from './node';
 import { SVG_DUMMY } from '../../misc/constants';
-import { RenderInfo } from '../../render_info';
 
 export default class Fog extends Node {
   canvas = document.createElement('canvas');
@@ -150,24 +149,24 @@ export default class Fog extends Node {
     this.Collapse();
   }
 
-  SetPattern(level, context) {
+  SetPattern(level, context, render_context) {
     var image_source = this.CoverSource(level);
     if (image_source) {
       var patternCanvas = image_source.canvas;
-      const x = RenderInfo.offset.x;
-      const y = RenderInfo.offset.y;
-      const scale = RenderInfo.grid_delta / patternCanvas.width;
+      const x = render_context.offset.x;
+      const y = render_context.offset.y;
+      const scale = render_context.grid_delta / patternCanvas.width;
       const pattern = context.createPattern(patternCanvas, 'repeat');
       pattern.setTransform(
         SVG_DUMMY.createSVGMatrix().translate(x, y).scale(scale)
       );
       context.fillStyle = pattern;
     } else {
-      context.fillStyle = this.Color(level) || RenderInfo.fog_color;
+      context.fillStyle = this.Color(level) || render_context.fog_color;
     }
   }
 
-  Draw(context) {
+  Draw(context, render_context) {
     context.save();
 
     context.globalCompositeOperation = 'source-atop';
@@ -176,17 +175,17 @@ export default class Fog extends Node {
 
     const fog_rects = this.AddRects();
     fog_rects.sort((a, b) => a.level < b.level);
-    const delta = RenderInfo.grid_delta;
-    const x_offset = RenderInfo.offset.x;
-    const y_offset = RenderInfo.offset.y;
+    const delta = render_context.grid_delta;
+    const x_offset = render_context.offset.x;
+    const y_offset = render_context.offset.y;
     let current_level = fog_rects[0] ? fog_rects[0].level : 0;
 
-    this.SetPattern(current_level, context);
+    this.SetPattern(current_level, context, render_context);
 
     fog_rects.forEach(rect => {
       if (rect.level != current_level) {
         current_level = rect.level;
-        this.SetPattern(current_level, context);
+        this.SetPattern(current_level, context, render_context);
       }
       const x = Math.round(rect.x * delta + x_offset);
       const y = Math.round(rect.y * delta + y_offset);

@@ -1,6 +1,5 @@
 import { observable } from 'mobx';
 import { PPI } from '../../misc/constants.js';
-import { RenderInfo } from '../../render_info.js';
 import { ImageSource } from './image_source';
 
 export default class LayerImage {
@@ -50,14 +49,14 @@ export default class LayerImage {
     };
   }
 
-  Draw(context) {
+  Draw(context, render_context) {
     var cache = ImageSource.Get(this.url);
     if (cache.valid) {
-      const x_offset = RenderInfo.Zoom((this.offset.x / this.ppi.x) * PPI);
-      const y_offset = RenderInfo.Zoom((this.offset.y / this.ppi.y) * PPI);
-      const x = RenderInfo.offset.x - x_offset;
-      const y = RenderInfo.offset.y - y_offset;
-      const zoom = RenderInfo.zoom;
+      const x_offset = render_context.Zoom((this.offset.x / this.ppi.x) * PPI);
+      const y_offset = render_context.Zoom((this.offset.y / this.ppi.y) * PPI);
+      const x = render_context.offset.x - x_offset;
+      const y = render_context.offset.y - y_offset;
+      const zoom = render_context.zoom;
       const width = (zoom * cache.width * PPI) / this.ppi.x;
       const height = (zoom * cache.height * PPI) / this.ppi.y;
       context.drawImage(cache.canvas, x, y, width, height);

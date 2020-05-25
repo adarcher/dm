@@ -66,8 +66,8 @@ export default class Board {
     };
   }
 
-  Draw(context) {
-    this.layers.forEach(l => l.Draw(context));
+  Draw(context, render_context) {
+    this.layers.forEach(l => l.Draw(context, render_context));
   }
 
   get index() {

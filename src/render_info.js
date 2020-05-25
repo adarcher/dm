@@ -7,7 +7,7 @@ import { GameRoom } from './gameroom';
 import { Diff } from './renderables/misc/common.js';
 import { Renderer } from './renderer.js';
 
-class RenderInfoSingleton {
+class RenderContext {
   // export default class RenderInfo {
   // For resizing only so far
   constructor() {
@@ -284,6 +284,15 @@ class RenderInfoSingleton {
     // this.grid_start.y = this.offset.y % this.grid_delta;
   }
 
+  UpdateCenterFromOffset(offset) {
+    this.center.x = (this.center_arm.x - offset.x) / this.zoom;
+    this.center.y = (this.center_arm.y - offset.y) / this.zoom;
+
+    this.offset.x = offset.x;
+    this.offset.y = offset.y;
+    this.Update(false);
+  }
+
   CenterOnGrid(center) {
     this.UpdateOffsetFromCenter({
       x: center.x * PPI,
@@ -339,4 +348,5 @@ class RenderInfoSingleton {
   };
 }
 
-export const RenderInfo = new RenderInfoSingleton();
+export const RenderInfo = new RenderContext();
+export const MiniMapInfo = new RenderContext();
