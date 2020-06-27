@@ -1,15 +1,12 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { observer } from 'mobx-react';
 import SButton from '../components/small_button.react';
 import { Renderer } from '../../renderer';
-import { MiniMapInfo, RenderInfo } from '../../render_info';
 import { GameRoom } from '../../gameroom';
-import { Grid } from '../../misc/grid';
-import Ping, { DrawPing } from '../../renderables/misc/ping';
 
 const MiniMap = props => {
   const canvas = useRef();
-  const dirty = useMemo(() => Renderer.dirty);
+  const info = useMemo(() => Renderer.minimap_info);
 
   useEffect(() => {
     if (canvas.current) {
@@ -19,19 +16,24 @@ const MiniMap = props => {
         context.canvas.width = 300;
         context.canvas.height = 150;
         const mouse = {
-          x: 0,
-          y: 0,
-          cx: 300 / 2,
-          cy: 150 / 2,
+          location: {
+            x: 0,
+            y: 0,
+            cx: 300 / 2,
+            cy: 150 / 2,
+          },
         };
-        MiniMapInfo.Update(mouse, 0.03);
-        MiniMapInfo.UpdateCenterFromOffset(mouse);
-        board.Draw(context, MiniMapInfo);
+        info.Update(mouse, 0.03);
+        info.UpdateCenterFromOffset(mouse);
+        Renderer.RenderMinimap(canvas.current);
+        // MiniMapInfo.Update(mouse, 0.03);
+        // MiniMapInfo.UpdateCenterFromOffset(mouse);
+        // board.Draw(context, MiniMapInfo);
 
-        Ping.DrawAll(context, MiniMapInfo);
+        // Ping.DrawAll(context);
       }
     }
-  }, [Renderer.dirty]);
+  }, [info.dirty]);
 
   return (
     <div className='minimap'>

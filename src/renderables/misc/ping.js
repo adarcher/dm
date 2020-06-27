@@ -11,28 +11,28 @@ export default class Ping {
     this.end = now + PING_DURATION;
   }
 
-  Draw(context, render_info, now = false) {
+  Draw(context, now = false) {
     now = now || Date.now();
     const t = 1 - (now - this.start) / (this.end - this.start);
 
     if (t >= 0 && t <= 1) {
-      const left = render_info.Zoom(this.x) + render_info.offset.x;
-      const top = render_info.Zoom(this.y) + render_info.offset.y;
+      const left = context.info.Zoom(this.x) + context.info.offset.x;
+      const top = context.info.Zoom(this.y) + context.info.offset.y;
 
-      const size = render_info.PingSize(t);
+      const size = context.info.PingSize(t);
 
-      const center_x = Math.min(Math.max(0, left), render_info.width);
-      const center_y = Math.min(Math.max(0, top), render_info.height);
-      context.beginPath();
-      context.arc(center_x, center_y, size / 2, 0, 6.28, false);
-      context.closePath();
+      const center_x = Math.min(Math.max(0, left), context.info.width);
+      const center_y = Math.min(Math.max(0, top), context.info.height);
+      context.canvas.beginPath();
+      context.canvas.arc(center_x, center_y, size / 2, 0, 6.28, false);
+      context.canvas.closePath();
 
       let fill_color = Color(this.color).fade(1 - t);
-      context.strokeStyle = this.color;
-      context.fillStyle = fill_color.string();
+      context.canvas.strokeStyle = this.color;
+      context.canvas.fillStyle = fill_color.string();
 
-      context.fill();
-      context.stroke();
+      context.canvas.fill();
+      context.canvas.stroke();
     }
   }
 
@@ -41,9 +41,9 @@ export default class Ping {
     this.ping_cache.push(new Ping(ping));
   }
 
-  static DrawAll(context, render_info, now = false) {
+  static DrawAll(context, now = false) {
     now = now || Date.now();
     this.ping_cache = this.ping_cache.filter(p => p.end > now);
-    this.ping_cache.forEach(p => p.Draw(context, render_info, now));
+    this.ping_cache.forEach(p => p.Draw(context, now));
   }
 }

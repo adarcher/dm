@@ -1,66 +1,30 @@
-// Draw a square grid on a context
-// const canvas = document.createElement('canvas');
-// // const context = canvas.getContext('2d');
-// // var fill = false;
+import { GRID_WIDTH } from './constants';
 
-// const setup = {
-//   width: 0,
-//   color: 'black'
-// };
+export function Grid(context) {
+  context.canvas.save();
+  context.canvas.strokeStyle = context.color || 'black';
+  context.canvas.lineWidth = context.info.Zoom(GRID_WIDTH);
+  context.canvas.globalAlpha = 0.5;
 
-export function Grid(
-    layer_context, start, line_width, grid_delta,
-    width = layer_context.canvas.width, height = layer_context.canvas.height,
-    color = 'black') {
-  // // if (!fill || setup.width != line_width || setup.color != color) {
-  // const context = canvas.getContext('2d');
-  // context.canvas.width = 96;
-  // context.canvas.height = 96;
-  // context.strokeStyle = color;
-  // context.lineWidth = line_width;
-  // context.globalAlpha = .5;
-  // context.clearRect(0, 0, 96, 96);
-  // context.strokeRect(0, 0, 96, 96);
+  const width = context.canvas.canvas.width;
+  const height = context.canvas.canvas.height;
 
-  // setup.width = line_width;
-  // setup.color = color;
-
-  // const fill = context.createPattern(canvas, 'repeat');
-  // // }
-
-  // const scale = grid_delta / 96;
-  // const m = {a: scale, b: 0, c: start.x, d: 0, e: scale, f: start.y};
-  // // fill.setTransform(m);
-  // const mm = new DOMMatrix();
-  // fill.setTransform(mm.translate(start.x, start.y).scale(scale));
-  // layer_context.save();
-  // layer_context.fillStyle = fill;
-
-  // // layer_context.globalCompositeOperation = 'source-atop';
-  // layer_context.fillRect(0, 0, width, height);
-  // layer_context.restore();
-
-  layer_context.save();
-  layer_context.strokeStyle = color;
-  layer_context.lineWidth = line_width;
-  layer_context.globalAlpha = .5;
-
-  layer_context.beginPath();
-  let x = start.x;
-  layer_context.moveTo(x, 0);
+  context.canvas.beginPath();
+  let x = context.info.grid_start.x;
+  context.canvas.moveTo(x, 0);
   while (x < width) {
-    layer_context.lineTo(x, height);
-    x = x + grid_delta;
-    layer_context.moveTo(x, 0);
+    context.canvas.lineTo(x, height);
+    x = x + context.info.grid_delta;
+    context.canvas.moveTo(x, 0);
   }
-  let y = start.y;
-  layer_context.moveTo(0, y);
+  let y = context.info.grid_start.y;
+  context.canvas.moveTo(0, y);
   while (y < height) {
-    layer_context.lineTo(width, y);
-    y = y + grid_delta;
-    layer_context.moveTo(0, y);
+    context.canvas.lineTo(width, y);
+    y = y + context.info.grid_delta;
+    context.canvas.moveTo(0, y);
   }
-  layer_context.stroke();
+  context.canvas.stroke();
 
-  layer_context.restore();
+  context.canvas.restore();
 }

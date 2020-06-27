@@ -4,7 +4,6 @@ import { Brush, BrushStyle } from '../renderables/brush';
 import { GameRoom } from '../gameroom';
 import Player from '../renderables/game_objects/player';
 import { Networking } from './websocket';
-import { RenderInfo } from '../render_info';
 import Ping from '../renderables/misc/ping';
 
 let previous_player_state = false;
@@ -62,7 +61,7 @@ const SetupJoin = (name, id) => {
   Networking.JoinRoom(id);
 
   Brush.style = BrushStyle.None;
-  RenderInfo.fog_color = 'rgba(0,0,0,1)';
+  Renderer.fog_color = 'rgba(0,0,0,1)';
 
   GameRoom.SubscribeToCheckState('Player', CheckPlayerState);
 };

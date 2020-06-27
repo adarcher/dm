@@ -1,8 +1,5 @@
 import { observable } from 'mobx';
-
 import { PPI } from '../../misc/constants';
-import { RenderInfo } from '../../render_info';
-
 import Grabbable from './grabbable';
 
 @Grabbable
@@ -36,72 +33,76 @@ export class Guide {
     }
   }
 
-  Position() {
-    const zoomed = RenderInfo.Zoom(
+  Position(context) {
+    const zoomed = context.info.Zoom(
       ((this.value - this.offset) * PPI) / this.ppi
     );
     if (this.vertical) {
-      const offset = RenderInfo.offset.x;
+      const offset = context.info.offset.x;
       return offset + zoomed;
     } else {
-      const offset = RenderInfo.offset.y;
+      const offset = context.info.offset.y;
       return offset + zoomed;
     }
   }
 
   Draw(context) {
     if (this.visible) {
-      context.save();
+      context.canvas.save();
 
-      const width = Math.max(1, RenderInfo.Zoom(1));
-      const position = this.Position();
-      context.lineWidth = width;
+      const width = Math.max(1, context.info.Zoom(1));
+      const position = this.Position(context);
+      context.canvas.lineWidth = width;
       let x = 0;
       let y = position - width;
-      let w = context.canvas.width;
+      let w = context.canvas.canvas.width;
       let h = 2 * width;
       if (this.vertical) {
         x = position - width;
         y = 0;
         w = 2 * width;
-        h = context.canvas.height;
+        h = context.canvas.canvas.height;
       }
       if (this.over) {
-        context.shadowColor = 'rgba(255,255,255,.5)';
-        context.shadowBlur = 1;
-        context.lineWidth = 2 * width;
-        context.strokeStyle = 'rgba(255,255,255,.5)';
-        context.strokeRect(x, y, w, h);
-        context.shadowBlur = 0;
+        context.canvas.shadowColor = 'rgba(255,255,255,.5)';
+        context.canvas.shadowBlur = 1;
+        context.canvas.lineWidth = 2 * width;
+        context.canvas.strokeStyle = 'rgba(255,255,255,.5)';
+        context.canvas.strokeRect(x, y, w, h);
+        context.canvas.shadowBlur = 0;
       }
-      context.lineWidth = width;
-      context.strokeStyle = this.color;
-      context.strokeRect(x, y, w, h);
+      context.canvas.lineWidth = width;
+      context.canvas.strokeStyle = this.color;
+      context.canvas.strokeRect(x, y, w, h);
 
-      context.restore();
+      context.canvas.restore();
     }
   }
 
-  Over(mouse) {
-    const width = Math.max(1, RenderInfo.Zoom(1));
-    const position = this.Position();
+  Over(context) {
+    const width = Math.max(1, context.info.Zoom(1));
+    const position = this.Position(context);
     if (this.vertical) {
-      this.over = mouse.x >= position - width && mouse.x <= position + width;
+      this.over =
+        context.location.x >= position - width &&
+        context.location.x <= position + width;
     } else {
-      this.over = mouse.y >= position - width && mouse.y <= position + width;
+      this.over =
+        context.location.y >= position - width &&
+        context.location.y <= position + width;
     }
     return this.over;
   }
 
-  MoveTo(mouse) {
+  MoveTo(context) {
     const location = this.vertical
-      ? RenderInfo.UnZoom(mouse.x - RenderInfo.offset.x)
-      : RenderInfo.UnZoom(mouse.y - RenderInfo.offset.y);
+      ? context.info.UnZoom(context.location.x - context.info.offset.x)
+      : context.info.UnZoom(context.location.y - context.info.offset.y);
     this.value = (location * this.ppi) / PPI + this.offset;
   }
 
-  Drop() {
-    this.onChange();
+  Drop(context) {
+    this.onChange(context);
   }
 
   UIState() {

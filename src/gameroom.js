@@ -1,19 +1,13 @@
-import { observable, action, computed } from 'mobx';
-import { RenderInfo } from './render_info';
+import { observable, action } from 'mobx';
 import Board from './renderables/game_objects/board';
 import Player from './renderables/game_objects/player';
 import { LoadIntoArray, Diff, Combine } from './renderables/misc/common';
 import { LS_PREFIX, MAX_STATES, LS_BACKUP_COUNT } from './misc/constants';
-import { Renderer } from './renderer';
 import { Networking, NetworkLatency } from './networking/websocket';
 import Layer from './renderables/game_objects/layer';
 
 // There can only be one Room open per webpage, export a singleton
 class GameRoomSingleton {
-  constructor() {
-    this.SubscribeToCheckState('RenderInfo', RenderInfo.CheckState);
-  }
-
   // Stored full raw data
   room = undefined;
 
@@ -53,7 +47,6 @@ class GameRoomSingleton {
       boards: this.boards.map(b => b.Save()),
       board_id: this.board_id,
       hidden: this.hidden,
-      grid: RenderInfo.grid_on,
     };
   }
 
@@ -190,7 +183,6 @@ class GameRoomSingleton {
       board_id: 0,
       boards: this.board ? [this.board.Save()] : [],
       hidden: this.hidden,
-      grid: RenderInfo.grid_on,
     };
 
     return state;
@@ -198,9 +190,6 @@ class GameRoomSingleton {
 
   LoadRenderState(state) {
     this.Load(state);
-    if (state.grid != undefined) {
-      RenderInfo.grid_on = state.grid;
-    }
   }
 
   current_state_id = 0;
@@ -229,7 +218,6 @@ class GameRoomSingleton {
     }
 
     if (changed) {
-      Renderer.dirty = true;
       this.previous_state = current_state;
 
       const max = this.states.length;
@@ -246,6 +234,8 @@ class GameRoomSingleton {
       this.latency_window,
       this.latency_size,
     ] = NetworkLatency.RTStat();
+
+    return changed;
   };
 
   listeners = {};
@@ -302,7 +292,7 @@ class GameRoomSingleton {
   Focus = () => {
     const board = this.board;
     if (board) {
-      RenderInfo.CenterOnGrid(board.focus);
+      board.Focus();
     }
   };
 }

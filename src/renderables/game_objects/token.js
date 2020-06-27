@@ -1,5 +1,4 @@
 import { observable, computed } from 'mobx';
-import { RenderInfo } from '../../render_info';
 import { ImageSource, PathSource, InitialsSource } from './image_source';
 import {
   GRID_WIDTH,
@@ -8,6 +7,7 @@ import {
 } from '../../misc/constants';
 import Grabbable from '../widgets/grabbable';
 import { GameRoom } from '../../gameroom';
+import { Renderer } from '../../renderer';
 
 let token_count = 0;
 export class TokenBase {
@@ -102,6 +102,9 @@ export default class Token extends TokenBase {
       }
       if (raw.current_roll != undefined) {
         this.current_roll = raw.current_roll;
+        if (this.current_roll.length != 3) {
+          this.current_roll = [0, 0, 0];
+        }
       }
     }
 
@@ -121,44 +124,44 @@ export default class Token extends TokenBase {
     return raw;
   }
 
-  Path(context, line_width, render_context) {
-    const delta = render_context.grid_delta;
-    const x_offset = render_context.offset.x;
-    const y_offset = render_context.offset.y;
+  Path(context, line_width) {
+    const delta = context.info.grid_delta;
+    const x_offset = context.info.offset.x;
+    const y_offset = context.info.offset.y;
     const x = Math.round(this.x * delta + x_offset);
     const y = Math.round(this.y * delta + y_offset);
     const size = Math.ceil(this.size * delta);
 
     const radius = size / 2;
-    context.beginPath();
-    context.arc(
+    context.canvas.beginPath();
+    context.canvas.arc(
       x + radius,
       y + radius,
-      radius - (render_context.zoom * (line_width + GRID_WIDTH)) / 2,
+      radius - (context.info.zoom * (line_width + GRID_WIDTH)) / 2,
       0,
       6.28,
       false
     );
-    context.closePath();
+    context.canvas.closePath();
   }
 
-  Draw(context, render_context) {
+  Draw(context) {
     if (!GameRoom.dm && !this.visible) {
       return;
     }
-    this.DrawPlayer(context, render_context);
-    context.save();
-    this.Path(context, TOKEN_BORDER_WIDTH, render_context);
+    this.DrawPlayer(context);
+    context.canvas.save();
+    this.Path(context, TOKEN_BORDER_WIDTH);
 
     // Fill Color
-    context.strokeStyle = this.color;
-    context.fillStyle = this.color;
-    context.globalAlpha = this.visible ? 1 : 0.5;
-    context.fill();
+    context.canvas.strokeStyle = this.color;
+    context.canvas.fillStyle = this.color;
+    context.canvas.globalAlpha = this.visible ? 1 : 0.5;
+    context.canvas.fill();
 
-    const delta = render_context.grid_delta;
-    const x_offset = render_context.offset.x;
-    const y_offset = render_context.offset.y;
+    const delta = context.info.grid_delta;
+    const x_offset = context.info.offset.x;
+    const y_offset = context.info.offset.y;
     const x = Math.round(this.x * delta + x_offset);
     const y = Math.round(this.y * delta + y_offset);
     const size = Math.ceil(this.size * delta);
@@ -171,34 +174,35 @@ export default class Token extends TokenBase {
     const aspect_offset_y =
       (size * ((major - patternCanvas.height) / major)) / 2;
     const scale = size / major;
-    const pattern = context.createPattern(patternCanvas, 'no-repeat');
+    const pattern = context.canvas.createPattern(patternCanvas, 'no-repeat');
     pattern.setTransform(
       SVG_DUMMY.createSVGMatrix()
         .translate(x + aspect_offset_x, y + aspect_offset_y)
         .scale(scale)
     );
-    context.fillStyle = pattern;
+    context.canvas.fillStyle = pattern;
 
     // Fill Image
-    context.fill();
+    context.canvas.fill();
 
     // Border
-    context.lineWidth = render_context.zoom * 5;
-    context.shadowColor = 'black';
-    context.shadowBlur = 10 * render_context.zoom;
-    context.stroke();
+    context.canvas.lineWidth = context.info.zoom * 5;
+    context.canvas.shadowColor = 'black';
+    context.canvas.shadowBlur = 10 * context.info.zoom;
+    context.canvas.stroke();
 
-    context.restore();
+    context.canvas.restore();
   }
 
   // Grabbable
   held_offset = { x: 0, y: 0 };
-  Over(mouse) {
+  Over(context) {
+    const sc = Renderer.GetScreenContext();
     const layer_x = this.x || 0;
     const layer_y = this.y || 0;
 
-    const x = RenderInfo.current_grid.x;
-    const y = RenderInfo.current_grid.y;
+    const x = sc.info.current_grid.x;
+    const y = sc.info.current_grid.y;
 
     this.held_offset = {
       x: x - layer_x,
@@ -218,38 +222,39 @@ export default class Token extends TokenBase {
     this.Lock();
   }
   unlock_timeout;
-  Drop() {
+  Drop(context) {
     this.pickup_location = false;
     this.unlock_timeout = setTimeout(() => this.Unlock(), 2000);
     // this.Unlock();
   }
 
-  MoveTo(mouse) {
-    this.x = RenderInfo.current_grid.x - this.held_offset.x;
-    this.y = RenderInfo.current_grid.y - this.held_offset.y;
+  MoveTo(context) {
+    const sc = Renderer.GetScreenContext();
+    this.x = sc.info.current_grid.x - this.held_offset.x;
+    this.y = sc.info.current_grid.y - this.held_offset.y;
   }
 
-  DrawOver(context, render_context) {
+  DrawOver(context) {
     if (!GameRoom.dm && !this.visible) {
       return;
     }
     if (this.over) {
-      context.strokeStyle = this.color;
-      this.Path(context, 0, render_context);
-      context.globalAlpha = 1;
-      context.lineWidth = 10 * render_context.zoom;
-      context.stroke();
+      context.canvas.strokeStyle = this.color;
+      this.Path(context, 0);
+      context.canvas.globalAlpha = 1;
+      context.canvas.lineWidth = 10 * context.info.zoom;
+      context.canvas.stroke();
     }
   }
 
-  DrawPlayer(context, render_context) {
+  DrawPlayer(context) {
     if (!GameRoom.dm && !this.visible) {
       return;
     }
     if (this.over) {
       const player = GameRoom.player;
       if (player.name == this.name) {
-        player.Draw(context, render_context, this.pickup_location);
+        player.Draw(context, this.pickup_location);
       }
     }
   }
@@ -261,14 +266,16 @@ export default class Token extends TokenBase {
   OnSizeChange = event => (this.size = Math.max(1, event.target.value));
 
   MoveToCenter = () => {
+    const context = Renderer.GetScreenContext();
     const offset = Math.floor(this.size / 2);
-    this.x = RenderInfo.grid_center.x - offset;
-    this.y = RenderInfo.grid_center.y - offset;
+    this.x = context.info.grid_center.x - offset;
+    this.y = context.info.grid_center.y - offset;
   };
 
   CenterOn = () => {
+    const context = Renderer.GetScreenContext();
     const offset = Math.floor(this.size / 2);
-    RenderInfo.CenterOnGrid({
+    Renderer.CenterOnGrid({
       x: this.x + offset,
       y: this.y + offset,
     });

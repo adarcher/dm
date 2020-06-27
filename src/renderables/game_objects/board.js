@@ -3,6 +3,8 @@ import Layer from './layer';
 import { LoadIntoArray } from '../misc/common';
 import { GameRoom } from '../../gameroom';
 import { GridSizer } from '../widgets/grid_sizer';
+import { Grid } from '../../misc/grid';
+import { Renderer } from '../../renderer';
 
 let board_count = 0;
 export default class Board {
@@ -14,6 +16,7 @@ export default class Board {
   @observable _layer_id = 0;
   @observable tags = [];
   @observable distance_step = 5;
+  @observable grid_on = true;
 
   get layer_id() {
     return this._layer_id;
@@ -23,7 +26,6 @@ export default class Board {
     if (GameRoom.dm) GridSizer.FromLayer(GameRoom.layer);
   }
 
-  // From RenderInfo
   focus = { x: 0, y: 0 };
 
   Load(raw) {
@@ -50,6 +52,9 @@ export default class Board {
     if (raw.distance_step != undefined) {
       this.distance_step = raw.distance_step;
     }
+    if (raw.grid_on != undefined) {
+      this.grid_on = raw.grid_on;
+    }
 
     return this;
   }
@@ -63,11 +68,16 @@ export default class Board {
       layers: this.layers.map(l => l.Save()),
       layer_id: this.layer_id,
       distance_step: this.distance_step,
+      grid_on: this.grid_on,
     };
   }
 
-  Draw(context, render_context) {
-    this.layers.forEach(l => l.Draw(context, render_context));
+  Draw(context) {
+    this.layers.forEach(l => l.Draw(context));
+
+    if (this.grid_on) {
+      Grid(context);
+    }
   }
 
   get index() {
@@ -79,4 +89,6 @@ export default class Board {
   OnActivate = () => (GameRoom.board_id = this.index);
   OnNameChange = event => (this.name = event.target.value);
   OnDescriptionChange = event => (this.description = event.target.value);
+
+  Focus = () => Renderer.CenterOnGrid(this.focus);
 }

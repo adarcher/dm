@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useRef } from 'react';
+import { PPI } from '../../misc/constants';
 
 const TokenPreview = props => {
   const token = props.token;

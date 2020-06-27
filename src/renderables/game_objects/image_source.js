@@ -3,7 +3,6 @@ import { TOKEN_TEXT_SIZE, PPI, SVG_DUMMY } from '../../misc/constants';
 import { observable, computed } from 'mobx';
 import { useState, useEffect } from 'react';
 import { Intent } from '@blueprintjs/core';
-import { RenderInfo } from '../../render_info';
 import { Renderer } from '../../renderer';
 
 export const SourceState = Enum(['Init', 'Loaded', 'Invalid', 'Loading']);
@@ -137,8 +136,8 @@ class P extends Source {
   }
 
   get canvas() {
-    const ratio = RenderInfo.grid_delta / 4 / PPI;
-    const lod = ratio < 1 ? 1 / this.PowerTwo(1 / ratio) : this.PowerTwo(ratio);
+    // const ratio = context.info.grid_delta / 4 / PPI;
+    const lod = 1; //ratio < 1 ? 1 / this.PowerTwo(1 / ratio) : this.PowerTwo(ratio);
     var c = this.lods[lod];
     if (!c) {
       c = document.createElement('canvas');
@@ -150,19 +149,19 @@ class P extends Source {
       c.width = size;
       c.height = size;
 
-      const context = c.getContext('2d');
-      context.fillStyle = this.color;
-      context.strokeStyle = 'black'; //this.color;
-      context.lineWidth = (10 * scale) / PPI;
+      const image_context = c.getContext('2d');
+      image_context.fillStyle = this.color;
+      image_context.strokeStyle = 'black'; //this.color;
+      image_context.lineWidth = (10 * scale) / PPI;
       const p = new Path2D(this.path);
       const shape = new Path2D();
       const transform = SVG_DUMMY.createSVGMatrix()
         .translate(x, y)
         .scale(scale / this.ppi);
       shape.addPath(p, transform);
-      context.stroke(shape);
-      // context.globalAlpha = 0.5;
-      context.fill(shape);
+      image_context.stroke(shape);
+      // image_context.globalAlpha = 0.5;
+      image_context.fill(shape);
     }
     return c;
   }

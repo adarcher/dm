@@ -49,17 +49,17 @@ export default class LayerImage {
     };
   }
 
-  Draw(context, render_context) {
+  Draw(context) {
     var cache = ImageSource.Get(this.url);
     if (cache.valid) {
-      const x_offset = render_context.Zoom((this.offset.x / this.ppi.x) * PPI);
-      const y_offset = render_context.Zoom((this.offset.y / this.ppi.y) * PPI);
-      const x = render_context.offset.x - x_offset;
-      const y = render_context.offset.y - y_offset;
-      const zoom = render_context.zoom;
+      const x_offset = context.info.Zoom((this.offset.x / this.ppi.x) * PPI);
+      const y_offset = context.info.Zoom((this.offset.y / this.ppi.y) * PPI);
+      const x = context.info.offset.x - x_offset;
+      const y = context.info.offset.y - y_offset;
+      const zoom = context.info.zoom;
       const width = (zoom * cache.width * PPI) / this.ppi.x;
       const height = (zoom * cache.height * PPI) / this.ppi.y;
-      context.drawImage(cache.canvas, x, y, width, height);
+      context.canvas.drawImage(cache.canvas, x, y, width, height);
     }
   }
 }

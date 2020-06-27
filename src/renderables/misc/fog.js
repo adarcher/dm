@@ -149,66 +149,66 @@ export default class Fog extends Node {
     this.Collapse();
   }
 
-  SetPattern(level, context, render_context) {
+  SetPattern(level, context) {
     var image_source = this.CoverSource(level);
     if (image_source) {
       var patternCanvas = image_source.canvas;
-      const x = render_context.offset.x;
-      const y = render_context.offset.y;
-      const scale = render_context.grid_delta / patternCanvas.width;
-      const pattern = context.createPattern(patternCanvas, 'repeat');
+      const x = context.info.offset.x;
+      const y = context.info.offset.y;
+      const scale = context.info.grid_delta / patternCanvas.width;
+      const pattern = context.canvas.createPattern(patternCanvas, 'repeat');
       pattern.setTransform(
         SVG_DUMMY.createSVGMatrix().translate(x, y).scale(scale)
       );
-      context.fillStyle = pattern;
+      context.canvas.fillStyle = pattern;
     } else {
-      context.fillStyle = this.Color(level) || render_context.fog_color;
+      context.canvas.fillStyle = this.Color(level) || context.fog_color;
     }
   }
 
-  Draw(context, render_context) {
-    context.save();
+  Draw(context) {
+    context.canvas.save();
 
-    context.globalCompositeOperation = 'source-atop';
+    context.canvas.globalCompositeOperation = 'source-atop';
 
-    context.globalAlpha = 1; //current_level / this.levels;
+    context.canvas.globalAlpha = 1; //current_level / this.levels;
 
     const fog_rects = this.AddRects();
     fog_rects.sort((a, b) => a.level < b.level);
-    const delta = render_context.grid_delta;
-    const x_offset = render_context.offset.x;
-    const y_offset = render_context.offset.y;
+    const delta = context.info.grid_delta;
+    const x_offset = context.info.offset.x;
+    const y_offset = context.info.offset.y;
     let current_level = fog_rects[0] ? fog_rects[0].level : 0;
 
-    this.SetPattern(current_level, context, render_context);
+    this.SetPattern(current_level, context);
 
     fog_rects.forEach(rect => {
       if (rect.level != current_level) {
         current_level = rect.level;
-        this.SetPattern(current_level, context, render_context);
+        this.SetPattern(current_level, context);
       }
       const x = Math.round(rect.x * delta + x_offset);
       const y = Math.round(rect.y * delta + y_offset);
       const width = Math.ceil(rect.width * delta);
       const height = Math.ceil(rect.height * delta);
       // // This might be a bit rough
-      // context.globalAlpha = rect.level / this.levels;
-      context.fillRect(x, y, width, height);
+      // context.canvas.globalAlpha = rect.level / this.levels;
+      context.canvas.fillRect(x, y, width, height);
     });
 
     if (this.debug) {
       const fog_boundries = this.AddBoundries();
-      context.lineWith = 3;
-      context.strokeStyle = 'red';
+      context.canvas.lineWith = 3;
+      context.canvas.strokeStyle = 'red';
       fog_boundries.forEach(rect => {
         const x = Math.round(rect.x * delta + x_offset);
         const y = Math.round(rect.y * delta + y_offset);
         const width = Math.ceil(rect.width * delta);
         const height = Math.ceil(rect.height * delta);
-        context.strokeRect(x, y, width, height);
+        context.canvas.strokeRect(x, y, width, height);
       });
     }
-    context.restore();
+    context.canvas.restore();
   }
 
   Save() {

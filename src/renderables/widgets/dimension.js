@@ -9,22 +9,22 @@ export default class Dimension {
   upper = new Guide();
   @observable grid_count = 0;
 
-  Over(mouse) {
-    this.lower.Over(mouse);
-    this.upper.Over(mouse);
+  Over(context) {
+    this.lower.Over(context);
+    this.upper.Over(context);
     this.over = this.lower.over || this.upper.over;
     return this.over;
   }
 
-  MoveTo(coord) {
+  MoveTo(context) {
     if (this.lower.over) {
-      this.lower.MoveTo(coord);
+      this.lower.MoveTo(context);
     } else if (this.upper.over) {
-      this.upper.MoveTo(coord);
+      this.upper.MoveTo(context);
     }
   }
 
-  Pickup() {}
+  Pickup(context) {}
 
   Draw(context) {
     if (this.visible) {
@@ -33,7 +33,7 @@ export default class Dimension {
     }
   }
 
-  Drop() {
+  Drop(context) {
     //test
     const delta = Math.max(1, this.upper.value - this.lower.value);
     const [extent, grid_count] = this.Extents();

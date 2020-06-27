@@ -1,46 +1,46 @@
 import { observable } from 'mobx';
 
-export default function Grabbable(clazz) {
+export default function Grabbable(c) {
   // Render variables
-  observable(clazz.prototype, 'over', { value: false });
-  observable(clazz.prototype, 'visible', { value: true });
+  observable(c.prototype, 'over', { value: false });
+  observable(c.prototype, 'visible', { value: true });
 
-  Object.defineProperty(clazz.prototype, 'locked', {
+  Object.defineProperty(c.prototype, 'locked', {
     get: function locked() {
       return this.lock || false;
     },
   });
 
-  clazz.prototype.Lock = function () {
+  c.prototype.Lock = function () {
     console.log('lock');
     this.lock = true;
   };
 
-  clazz.prototype.Unlock = function () {
+  c.prototype.Unlock = function () {
     console.log('unlock');
     this.lock = false;
   };
 
   // Manipulation functions
-  clazz.prototype.Over =
-    clazz.prototype.Over ||
-    function (coord) {
+  c.prototype.Over =
+    c.prototype.Over ||
+    function (context) {
       return false;
     };
-  clazz.prototype.MoveTo = clazz.prototype.MoveTo || function (coord) {};
-  clazz.prototype.Pickup =
-    clazz.prototype.Pickup ||
-    function () {
+  c.prototype.MoveTo = c.prototype.MoveTo || function (context) {};
+  c.prototype.Pickup =
+    c.prototype.Pickup ||
+    function (context) {
       this.Lock();
     };
-  clazz.prototype.Drop =
-    clazz.prototype.Drop ||
-    function () {
+  c.prototype.Drop =
+    c.prototype.Drop ||
+    function (context) {
       this.Unlock();
     };
 
-  clazz.prototype.UIState =
-    clazz.prototype.UIState ||
+  c.prototype.UIState =
+    c.prototype.UIState ||
     function () {
       return this.over ? 'on' : 'off';
     };

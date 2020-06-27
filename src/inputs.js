@@ -1,20 +1,23 @@
 import { GameRoom } from './gameroom';
-import { RenderInfo } from './render_info';
 import { Brush } from './renderables/brush';
 import { Networking } from './networking/websocket';
 import Ping from './renderables/misc/ping';
+import { Renderer } from './renderer';
 
-export const EnableInput = dom => {
+export const EnableInput = (dom, render_context) => {
   console.log(`Enabling input listeners on: ${dom}`);
   // Collect MouseEvent data
   const EventData = event => {
     event.preventDefault();
     return {
-      x: event.offsetX,
-      y: event.offsetY,
-      cx: event.target.clientWidth / 2,
-      cy: event.target.clientHeight / 2,
-      up: (event.wheelDelta || -event.deltaY) > 0,
+      info: render_context,
+      location: {
+        x: event.offsetX,
+        y: event.offsetY,
+        cx: event.target.clientWidth / 2,
+        cy: event.target.clientHeight / 2,
+        up: (event.wheelDelta || -event.deltaY) > 0,
+      },
     };
   };
 
@@ -42,9 +45,9 @@ export const EnableInput = dom => {
     const now = Date.now();
     if (now >= lastwheel + 33) {
       if (GameRoom.dm) {
-        RenderInfo.Update(data, data.up);
+        Renderer.Update(data, data.location.up);
       } else {
-        RenderInfo.setZoom(data.up);
+        Renderer.setZoom(data.location.up);
       }
       lastwheel = now;
     }
@@ -53,7 +56,7 @@ export const EnableInput = dom => {
   dom.onmousedown = event => {
     const data = EventData(event);
 
-    const held = RenderInfo.widgets.filter(object => object.over);
+    const held = Renderer.widgets.filter(object => object.over);
     if (held.length == 0) {
       const held_token = LayerTokens()
         .filter(object => object.over)
@@ -62,14 +65,14 @@ export const EnableInput = dom => {
         held.push(held_token);
       }
     }
-    RenderInfo.held = held;
+    Renderer.held = held;
     held.forEach(object => object.Pickup());
     if (held.length == 0) {
       Brush.active = true;
-      if (!Brush.Paint() && GameRoom.dm) {
-        RenderInfo.pan_offset = {
-          offset: RenderInfo.offset,
-          pan_from: data,
+      if (!Brush.Paint(data) && GameRoom.dm) {
+        render_context.pan_offset = {
+          offset: render_context.offset,
+          pan_from: data.location,
         };
       }
     }
@@ -78,28 +81,28 @@ export const EnableInput = dom => {
   dom.onmouseup = event => {
     const data = EventData(event);
 
-    if (RenderInfo.held.length == 0) {
-      RenderInfo.Update(data);
+    if (Renderer.held.length == 0) {
+      render_context.Update(data);
 
       // TODO: Clean this up
       if (
         event.type != 'mouseleave' &&
-        (!RenderInfo.pan_offset ||
-          RenderInfo.pan_offset.offset == RenderInfo.offset)
+        (!render_context.pan_offset ||
+          render_context.pan_offset.offset == render_context.offset)
       ) {
         let ping = {
-          x: RenderInfo.location.x,
-          y: RenderInfo.location.y,
+          x: render_context.location.x,
+          y: render_context.location.y,
           color: GameRoom.player.color,
         };
         Ping.Add(ping);
         Networking.Send({ ping: ping });
       }
 
-      RenderInfo.pan_offset = false;
+      render_context.pan_offset = false;
     } else {
-      RenderInfo.held.forEach(object => object.Drop());
-      RenderInfo.held = [];
+      Renderer.held.forEach(object => object.Drop());
+      Renderer.held = [];
     }
     Brush.active = false;
   };
@@ -111,13 +114,13 @@ export const EnableInput = dom => {
     const now = Date.now();
     if (now >= lastmove + 16) {
       lastmove = now;
-      RenderInfo.Update(data);
-      if (RenderInfo.held.length == 0) {
-        Brush.Paint();
-        RenderInfo.widgets.forEach(object => object.Over(data));
+      render_context.Update(data);
+      if (Renderer.held.length == 0) {
+        Brush.Paint(data);
+        Renderer.widgets.forEach(object => object.Over(data));
         LayerTokens().forEach(object => object.Over(data));
       } else {
-        RenderInfo.held.forEach(object => object.MoveTo(data));
+        Renderer.held.forEach(object => object.MoveTo(data));
       }
     }
   };

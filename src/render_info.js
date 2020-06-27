@@ -5,11 +5,9 @@ import { Wall } from './misc/wall.js';
 import Blur from './renderables/blur.js';
 import { GameRoom } from './gameroom';
 import { Diff } from './renderables/misc/common.js';
-import { Renderer } from './renderer.js';
 import Ping from './renderables/misc/ping.js';
 
-class RenderContext {
-  // export default class RenderInfo {
+export class RenderContext {
   // For resizing only so far
   constructor() {
     this.Resize();
@@ -17,14 +15,15 @@ class RenderContext {
     if (window) {
       window.addEventListener('resize', this.Resize);
     }
+
+    this.dirty = true;
   }
 
   Resize = () => {
     this.center_arm = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     this.UpdateOffsetFromCenter(this.center);
-    if (Renderer) Renderer.dirty = true;
+    this.dirty = true;
   };
-  // End constuctor stage
 
   // Observables declared/defined first
   // Grid mouse is currently over
@@ -58,18 +57,6 @@ class RenderContext {
 
   hidden = false;
 
-  // Not used
-  @observable rotation = 90;
-  @observable grid_on = true;
-
-  // Extras
-  @observable extras = [];
-  @observable fog_color = 'black';
-
-  // Held Widgets
-  @observable widgets = [];
-  @observable held = [];
-
   // Animation variables
   animation_start_time = 0;
   animation_length = 0;
@@ -98,17 +85,20 @@ class RenderContext {
 
     this.Update(
       {
-        x: this.center_arm.x,
-        y: this.center_arm.y,
-        cx: this.center_arm.x,
-        cy: this.center_arm.y,
+        location: {
+          x: this.center_arm.x,
+          y: this.center_arm.y,
+          cx: this.center_arm.x,
+          cy: this.center_arm.y,
+        },
       },
       val
     );
   }
 
   @action
-  Update(mouse, zoom = undefined) {
+  Update(context, zoom = undefined) {
+    const mouse = context.location;
     if (mouse) {
       this.mouse = mouse;
 
@@ -277,7 +267,7 @@ class RenderContext {
     this.center.x = center.x;
     this.center.y = center.y;
 
-    this.Update(false);
+    this.Update({ location: false });
     // this.grid_start.x = this.offset.x % this.grid_delta;
     // this.grid_start.y = this.offset.y % this.grid_delta;
   }
@@ -288,14 +278,7 @@ class RenderContext {
 
     this.offset.x = offset.x;
     this.offset.y = offset.y;
-    this.Update(false);
-  }
-
-  CenterOnGrid(center) {
-    this.UpdateOffsetFromCenter({
-      x: center.x * PPI,
-      y: center.y * PPI,
-    });
+    this.Update({ location: false });
   }
 
   ExitMode() {
@@ -318,32 +301,6 @@ class RenderContext {
     this.extras = this.extras.filter(extra => extra != this.blur);
   }
 
-  UIState() {
-    return {
-      zoom: this.zoom,
-      grid: this.grid_on,
-      widgets: this.widgets.map(w => w.UIState()),
-      tokens: GameRoom.tokens.map(t => t.UIState()),
-    };
-  }
-
-  previous_ui_state = false;
-  CheckState = () => {
-    if (Ping.ping_cache.length > 0) {
-      Renderer.dirty = true;
-    }
-    const current_ui_state = this.UIState();
-    current_ui_state.pings = Ping.ping_cache.length;
-    if (this.previous_ui_state) {
-      const diff = Diff(this.previous_ui_state, current_ui_state, false);
-      if (diff) {
-        Renderer.dirty = true;
-      }
-    }
-
-    this.previous_ui_state = current_ui_state;
-  };
-
   ping_min = 0.1;
   ping_max = 0.9;
   ping_size = PPI;
@@ -355,8 +312,3 @@ class RenderContext {
     }
   };
 }
-
-export const RenderInfo = new RenderContext();
-export const MiniMapInfo = new RenderContext();
-MiniMapInfo.ping_size = 5;
-MiniMapInfo.ping_min = MiniMapInfo.ping_max;

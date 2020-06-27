@@ -50,28 +50,28 @@ export default class Player extends TokenBase {
     return raw;
   }
 
-  Draw(context, render_context, optional_location = false) {
+  Draw(context, optional_location = false) {
     const token = this.token;
     if (token) {
-      context.save();
-      context.lineWidth = render_context.zoom * TOKEN_BORDER_WIDTH;
+      context.canvas.save();
+      context.canvas.lineWidth = context.info.zoom * TOKEN_BORDER_WIDTH;
       const rx = optional_location ? optional_location.x : token.x;
       const ry = optional_location ? optional_location.y : token.y;
 
       const val = this.run;
-      const delta = render_context.grid_delta;
+      const delta = context.info.grid_delta;
       const radius = Math.floor(val / 5);
       const size = (2 * radius + 1) * delta;
-      const x_offset = render_context.offset.x;
-      const y_offset = render_context.offset.y;
+      const x_offset = context.info.offset.x;
+      const y_offset = context.info.offset.y;
       const x = Math.round((rx - radius) * delta + x_offset);
       const y = Math.round((ry - radius) * delta + y_offset);
 
-      context.strokeStyle = Player.movement_colors.run;
-      context.fillStyle = `${Player.movement_colors.run}44`;
-      context.fillRect(x, y, size, size);
-      context.strokeRect(x, y, size, size);
-      context.restore();
+      context.canvas.strokeStyle = Player.movement_colors.run;
+      context.canvas.fillStyle = `${Player.movement_colors.run}44`;
+      context.canvas.fillRect(x, y, size, size);
+      context.canvas.strokeRect(x, y, size, size);
+      context.canvas.restore();
     }
   }
 

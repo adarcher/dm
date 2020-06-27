@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { observable } from 'mobx';
 import Enum from '../misc/enum';
 import { Networking } from '../networking/websocket';
-import { GameRoom } from '../gameroom';
 import DMHeader from './sub/dm_header.react';
 import { TOOLSET } from '../misc/constants';
 import DMToolsLeft from './sub/dm_tools_left.react';
@@ -12,7 +11,6 @@ import { EnableInput } from '../inputs';
 import DMInfo from './sub/dm_info.react';
 import Host from '../networking/host';
 import Join from '../networking/join';
-import { RenderInfo } from '../render_info';
 
 const Modes = Enum(['Welcome', 'Host', 'View', 'Player']);
 
@@ -31,7 +29,7 @@ export class Screen extends React.Component {
   }
 
   componentDidMount() {
-    EnableInput(this.input_ref.current);
+    EnableInput(this.input_ref.current, Renderer.screen_info);
   }
 
   // This is the 2d canvas reference for rendering the game
@@ -39,7 +37,7 @@ export class Screen extends React.Component {
   @observable input_ref = React.createRef();
 
   Draw = () => {
-    Renderer.Render(this.canvas_ref.current, RenderInfo);
+    Renderer.RenderScreen(this.canvas_ref.current);
     window.requestAnimationFrame(this.Draw);
   };
 

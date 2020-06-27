@@ -1,5 +1,3 @@
-import { RenderInfo } from '../../render_info';
-
 import Grabbable from './grabbable';
 import HorizontalDimension from './horizontal_dimension';
 import VerticalDimension from './vertical_dimension';
@@ -23,68 +21,68 @@ export default class BoundingBox {
     }
   }
 
-  Over(coord) {
-    this.vertical.Over(coord);
-    this.horizontal.Over(coord);
+  Over(context) {
+    this.vertical.Over(context);
+    this.horizontal.Over(context);
     this.over = this.vertical.over || this.horizontal.over;
     return this.over;
   }
 
-  MoveTo(coord) {
+  MoveTo(context) {
     if (this.vertical.over) {
-      this.vertical.MoveTo(coord);
+      this.vertical.MoveTo(context);
     }
     if (this.horizontal.over) {
-      this.horizontal.MoveTo(coord);
+      this.horizontal.MoveTo(context);
     }
   }
 
-  Drop() {
-    this.vertical.Drop();
-    this.horizontal.Drop();
+  Drop(context) {
+    this.vertical.Drop(context);
+    this.horizontal.Drop(context);
   }
 
-  OverLocation() {
+  OverLocation(context) {
     var dimension = this.vertical.over ? this.vertical : this.horizontal;
     var guide = dimension.lower.over ? dimension.lower : dimension.upper;
     if (guide.vertical) {
       return {
-        x: guide.Position(),
-        y: RenderInfo.mouse.y,
+        x: guide.Position(context),
+        y: context.info.mouse.y,
       };
     } else {
       return {
-        x: RenderInfo.mouse.x,
-        y: guide.Position(),
+        x: context.info.mouse.x,
+        y: guide.Position(context),
       };
     }
   }
 
   // Draw text for the grid count between lower/upper
   DrawGridCount(context) {
-    context.save();
-    const location = this.OverLocation();
+    context.canvas.save();
+    const location = this.OverLocation(context);
     const grid_count = this.vertical.over
       ? this.horizontal.grid_count
       : this.vertical.grid_count;
     const text_height = 24;
     const padding = 2;
-    context.font = `${text_height}px Verdana`;
-    context.textBaseline = 'ideographic';
-    context.fillStyle = 'red';
-    const t = context.measureText(grid_count);
+    context.canvas.font = `${text_height}px Verdana`;
+    context.canvas.textBaseline = 'ideographic';
+    context.canvas.fillStyle = 'red';
+    const t = context.canvas.measureText(grid_count);
     const rect = {
       x: location.x - t.width / 2 - padding,
       y: location.y - text_height - padding,
       width: t.width + 2 * padding,
       height: text_height + 2 * padding,
     };
-    context.fillRect(rect.x, rect.y, rect.width, rect.height);
-    context.fillStyle = 'white';
+    context.canvas.fillRect(rect.x, rect.y, rect.width, rect.height);
+    context.canvas.fillStyle = 'white';
     const text = { x: rect.x + padding, y: location.y };
-    context.fillText(grid_count, text.x, text.y);
+    context.canvas.fillText(grid_count, text.x, text.y);
 
-    context.restore();
+    context.canvas.restore();
   }
 
   Draw(context) {

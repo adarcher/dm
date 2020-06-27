@@ -1,11 +1,7 @@
-// For now, this is only for showing size.
-// TODO: add preview and other pallete options
 import { observable } from 'mobx';
-
 import Enum from '../misc/enum.js';
 import { Wall } from '../misc/wall.js';
 import { GameRoom } from '../gameroom';
-import { RenderInfo } from '../render_info.js';
 import { GROUND_EFFECTS } from '../misc/constants.js';
 
 export const BrushStyle = Enum(['Fog', 'Paint', 'None']);
@@ -37,48 +33,50 @@ class BrushSingleton {
   }
 
   DrawGhost(context) {
-    context.strokeStyle = this.grid_color;
-    context.globalAlpha = 0.75;
-    context.lineWidth = RenderInfo.Zoom(10);
-    const delta = this.minor_radius * RenderInfo.grid_delta;
+    context.canvas.strokeStyle = this.grid_color;
+    context.canvas.globalAlpha = 0.75;
+    context.canvas.lineWidth = context.info.Zoom(10);
+    const delta = this.minor_radius * context.info.grid_delta;
     const x =
-      RenderInfo.offset.x +
-      RenderInfo.current_grid.x * RenderInfo.grid_delta -
+      context.info.offset.x +
+      context.info.current_grid.x * context.info.grid_delta -
       delta;
     const y =
-      RenderInfo.offset.y +
-      RenderInfo.current_grid.y * RenderInfo.grid_delta -
+      context.info.offset.y +
+      context.info.current_grid.y * context.info.grid_delta -
       delta;
-    const size = this.radius * RenderInfo.grid_delta;
-    context.strokeRect(x, y, size, size);
+    const size = this.radius * context.info.grid_delta;
+    context.canvas.strokeRect(x, y, size, size);
   }
 
   DrawNearestWall(context) {
-    context.fillStyle = this.wall_color;
-    context.globalAlpha = 0.5;
+    context.canvas.fillStyle = this.wall_color;
+    context.canvas.globalAlpha = 0.5;
     let x =
-      RenderInfo.offset.x + RenderInfo.current_grid.x * RenderInfo.grid_delta;
+      context.info.offset.x +
+      context.info.current_grid.x * context.info.grid_delta;
     let y =
-      RenderInfo.offset.y + RenderInfo.current_grid.y * RenderInfo.grid_delta;
-    let width = RenderInfo.grid_delta;
-    let height = RenderInfo.grid_delta;
-    switch (RenderInfo.current_wall) {
+      context.info.offset.y +
+      context.info.current_grid.y * context.info.grid_delta;
+    let width = context.info.grid_delta;
+    let height = context.info.grid_delta;
+    switch (context.info.current_wall) {
       case Wall.South: {
-        y += 0.8 * RenderInfo.grid_delta;
+        y += 0.8 * context.info.grid_delta;
       }
       case Wall.North: {
-        height = 0.2 * RenderInfo.grid_delta;
+        height = 0.2 * context.info.grid_delta;
         break;
       }
       case Wall.East: {
-        x += 0.8 * RenderInfo.grid_delta;
+        x += 0.8 * context.info.grid_delta;
       }
       case Wall.West: {
-        width = 0.2 * RenderInfo.grid_delta;
+        width = 0.2 * context.info.grid_delta;
         break;
       }
     }
-    context.fillRect(x, y, width, height);
+    context.canvas.fillRect(x, y, width, height);
   }
 
   // For now, just always highlight the brush and the possible wall.
@@ -86,27 +84,27 @@ class BrushSingleton {
     if (!this.visible) {
       return;
     }
-    context.save();
+    context.canvas.save();
 
     // Adds some depth, so it's more visible
-    context.shadowColor = 'black';
-    context.shadowBlur = 15;
+    context.canvas.shadowColor = 'black';
+    context.canvas.shadowBlur = 15;
 
-    if (RenderInfo.current_grid) {
+    if (context.info.current_grid) {
       this.DrawGhost(context);
     }
 
-    if (RenderInfo.current_wall != Wall.None) {
+    if (context.info.current_wall != Wall.None) {
       this.DrawNearestWall(context);
     }
 
-    context.restore();
+    context.canvas.restore();
   };
 
   // Return if painting
-  Paint() {
+  Paint(context) {
     if (this.active) {
-      const cg = RenderInfo.current_grid;
+      const cg = context.info.current_grid;
       switch (this.style) {
         case BrushStyle.Fog: {
           switch (this.fog_style) {

@@ -1,9 +1,9 @@
 import { Networking } from './websocket';
 import { GameRoom } from '../gameroom';
 import Player from '../renderables/game_objects/player';
-import { RenderInfo } from '../render_info';
 import { GridSizer } from '../renderables/widgets/grid_sizer';
 import Ping from '../renderables/misc/ping';
+import { Renderer } from '../renderer';
 
 const SendGameState = state => {
   Networking.Send({ game: state });
@@ -44,9 +44,9 @@ const SetupHost = id => {
   GameRoom.LoadFromDisk();
 
   // Host render differences
-  RenderInfo.CenterOnGrid(GameRoom.board.focus);
-  RenderInfo.fog_color = 'rgba(0,0,0,.75)';
-  RenderInfo.widgets.push(GridSizer);
+  Renderer.CenterOnGrid(GameRoom.board.focus);
+  Renderer.fog_color = 'rgba(0,0,0,.75)';
+  Renderer.widgets.push(GridSizer);
 
   Networking.customDataIn = HostDataIn;
   Networking.OpenRoom(id);
