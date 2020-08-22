@@ -427,3 +427,18 @@ canvas.token-image-preview {
   top: 0;
   right: 40;
 }
+
+.minimap {
+  position: RELATIVE;
+  border: 1px inset black;
+  background: black;
+}
+
+.minimap-controls {
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  bottom: -10;
+  left: -10;
+  width: calc(100% + 20px);
+}
