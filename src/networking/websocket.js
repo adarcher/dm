@@ -94,7 +94,7 @@ class NetworkingSingleton {
       this.peer.destroy();
     }
     id = this.FormatRoomId(this.id);
-    console.log(`WebSocket: Init with [${id}]`);
+    console.log(`WebSocket: Init with [${id || 'Client'}]`);
     this.peer = new Peer(id, {
       host: 'dmpeer.herokuapp.com',
       path: '/myapp',
@@ -110,11 +110,18 @@ class NetworkingSingleton {
   HostDataIn = (data, connection) => {};
 
   DataIn(data, connection) {
+    let d = data;
+    if (typeof d == 'string') {
+      d = d.substring(0,20);
+    }
+    console.log(`data in[${connection.peer}] :: ${d}`);
     this.state = CONNECTED;
 
     if (data == 'ping') {
+      console.log(`Ping -> <Pong> :: ${connection.peer}`)
       connection.Send('pong');
     } else if (data == 'connect') {
+      console.log(`connect -> <connected> :: ${connection.peer}`)
       connection.Send('connected');
     }
 
@@ -128,6 +135,7 @@ class NetworkingSingleton {
     //  - when CONNECTING/CONNECTED, send a ping: => DELAYED
     //  - when DELAYED, we missed a pong: shutdown, => DISCONNECTED
     //  - when DISCONNECTED, re-init: => CONNECTING
+    console.log(`ClientHeartBeat()::current state==${this.state}`);
     switch (this.state) {
       case DELAYED: {
         if (this.peer) {
@@ -146,6 +154,7 @@ class NetworkingSingleton {
         this.state = DELAYED;
       }
     }
+    console.log(`ClientHeartBeat()::new state==${this.state}`);
   };
 
   ListenToConnection(connection) {
@@ -180,7 +189,13 @@ class NetworkingSingleton {
     });
     connection.on('disconnected', () => {
       console.log(`WebSocket Connection(${connection.peer}) disconnection.`);
-      this.connections.splice(this.connections.find(connection), 1);
+      const index = this.connections.findIndex(connection);
+      if (index >= 0) {
+        this.connections.splice(index, 1);
+        console.log(`remove connection[${connection.peer}] @ #{index]}`);
+      } else {
+        console.log(`connection[${connection.peer}] not found`);
+      }
     });
     connection.on('close', () => {
       console.log(`WebSocket Connection(${connection.peer}) closed.`);
@@ -231,9 +246,9 @@ class NetworkingSingleton {
       this.connections = [];
 
       this.peer.on('connection', connection => {
+        this.ListenToConnection(connection);
         console.log(`WebSocket Connecting: ${connection.peer}`);
 
-        this.ListenToConnection(connection);
       });
     }
   }
