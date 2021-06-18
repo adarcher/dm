@@ -5,3 +5,4 @@ node_modules
 stats.json
 src/tools/test.json
 src/tools/mapping.mjs
+npm-debug.log
