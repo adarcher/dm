@@ -80,7 +80,8 @@ export class ImageSource extends Source {
         this.canvas.height
       );
       this.state = SourceState.Loaded;
-      Renderer.dirty = true;
+      // Renderer.dirty = true;
+      Renderer.SetDirty(true);
     };
     this.image.onerror = () => {
       this.state = SourceState.Invalid;

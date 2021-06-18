@@ -56,7 +56,7 @@ const GameGate = canvas_context => {
 };
 
 class RendererSingleton {
-  @observable dirty = false;
+  @observable dirty = true;
 
   // Held Widgets
   @observable widgets = [];
