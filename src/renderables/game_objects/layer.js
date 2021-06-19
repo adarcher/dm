@@ -92,6 +92,11 @@ export default class Layer {
     } else {
       this.background.Draw(layer_context);
     }
+    
+    // HACK: this should be setup when the background gets loaded
+    const bg = this.background;
+    this.grid.width = Math.floor(bg.size.width / bg.ppi.x);
+    this.grid.height = Math.floor(bg.size.height / bg.ppi.y);
 
     // layer tokens
     this.tokens.forEach(t => t.Draw(layer_context));
