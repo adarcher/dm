@@ -22,8 +22,22 @@ export default class Board {
     return this._layer_id;
   }
   set layer_id(id) {
+    let layer = this.ActiveLayer();
+    if (layer) {
+      layer.active = false;
+    }
     this._layer_id = id;
+    layer = this.ActiveLayer();
     if (GameRoom.dm) GridSizer.FromLayer(GameRoom.layer);
+  }
+
+  ActiveLayer() {
+    if (this.layers[this._layer_id]) {
+      const layer = this.layers[this._layer_id]
+      layer.active = true
+      return layer
+    }
+    return false
   }
 
   focus = { x: 0, y: 0 };

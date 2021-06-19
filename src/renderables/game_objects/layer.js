@@ -20,6 +20,7 @@ export default class Layer {
   @observable fog = new Fog(10, 10);
   @observable effects = new GroundEffects();
   @observable tokens = [];
+  @observable active = false;
 
   canvas = document.createElement('canvas');
 
@@ -95,11 +96,13 @@ export default class Layer {
     
     // HACK: this should be setup when the background gets loaded
     const bg = this.background;
-    this.grid.width = Math.floor(bg.size.width / bg.ppi.x);
-    this.grid.height = Math.floor(bg.size.height / bg.ppi.y);
+    this.grid.width = Math.round(bg.size.width / bg.ppi.x);
+    this.grid.height = Math.round(bg.size.height / bg.ppi.y);
 
     // layer tokens
-    this.tokens.forEach(t => t.Draw(layer_context));
+    if (this.active) {
+      this.tokens.forEach(t => t.Draw(layer_context));
+    }
 
     this.effects.Draw(layer_context);
     this.fog.Draw(layer_context);
